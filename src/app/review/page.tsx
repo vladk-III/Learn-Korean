@@ -86,7 +86,12 @@ export default function Review() {
     const total = due.length + fresh.length;
     return (
       <div className="pt-safe px-4">
-        <h1 className="pt-5 text-2xl font-extrabold">복습 Review</h1>
+        <div className="flex items-end justify-between pt-5">
+          <h1 className="text-2xl font-extrabold">복습 Review</h1>
+          <Link href="/study/" className="card flex items-center gap-1.5 px-3 py-2 text-sm font-bold">
+            🃏 Flashcards &amp; games
+          </Link>
+        </div>
         <p className="muted text-sm">Active recall with FSRS spacing. Reviews first, then new cards.</p>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div className="card p-4">

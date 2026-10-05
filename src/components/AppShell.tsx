@@ -59,7 +59,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <nav className="card pb-safe fixed inset-x-0 bottom-0 z-30 mx-auto max-w-xl rounded-none rounded-t-2xl border-x-0 border-b-0">
         <ul className="grid grid-cols-5">
           {NAV.map(({ href, label, icon: Icon }) => {
-            const active = href === "/" ? pathname === "/" : pathname.startsWith(href.replace(/\/$/, ""));
+            const active =
+              href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(href.replace(/\/$/, "")) || (href === "/review/" && pathname.startsWith("/study"));
             return (
               <li key={href}>
                 <Link

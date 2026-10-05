@@ -84,6 +84,8 @@ export interface Data {
   days: Record<string, DayStats>;
   imported: Article[];
   quizzes: QuizResult[];
+  /** Best Type It! scores, keyed by `${setId}:${mode}`. */
+  bestScores: Record<string, number>;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -108,6 +110,7 @@ const empty = (): Data => ({
   days: {},
   imported: [],
   quizzes: [],
+  bestScores: {},
 });
 
 let data: Data = empty();
@@ -386,6 +389,14 @@ export const actions = {
     const lemmas = new Set(items.map((i) => i.lemma));
     commit({ ...d, cards: [...d.cards, ...fresh], known: d.known.filter((k) => !lemmas.has(k)) });
     return fresh.length;
+  },
+
+  /** Saves a game score; returns true if it's a new best. */
+  recordScore(key: string, score: number): boolean {
+    const d = getData();
+    if (score <= (d.bestScores[key] ?? 0)) return false;
+    commit({ ...d, bestScores: { ...d.bestScores, [key]: score } });
+    return true;
   },
 
   recordQuiz(r: QuizResult) {

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, Clapperboard, Flame, Layers, Lock } from "lucide-react";
+import { BookOpen, Clapperboard, Flame, Keyboard, Layers, Lock } from "lucide-react";
 import { ARTICLES } from "@/content/articles";
 import { CLIPS } from "@/content/clips";
 import CoverageBadge from "@/components/CoverageBadge";
@@ -116,6 +116,17 @@ export default function Today() {
               <p className="muted text-sm">
                 {clip.emoji} {clip.title} · {clip.titleEn}
               </p>
+            </div>
+          </Link>
+        </li>
+        <li>
+          <Link href="/study/" className="card flex items-center gap-4 p-4">
+            <span className="rounded-2xl bg-amber-500 p-3 text-white">
+              <Keyboard />
+            </span>
+            <div className="flex-1">
+              <p className="font-bold">Bonus: flashcards &amp; Type It!</p>
+              <p className="muted text-sm">Flip cards or race the clock typing words</p>
             </div>
           </Link>
         </li>

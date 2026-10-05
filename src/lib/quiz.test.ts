@@ -33,3 +33,17 @@ describe("buildQuiz", () => {
     }
   });
 });
+
+describe("study sets", async () => {
+  const { itemsFromContent } = await import("./study");
+  it("builds vocab sets from every article and clip", () => {
+    for (const c of [...ARTICLES, ...CLIPS]) {
+      const items = itemsFromContent(c);
+      expect(items.length, c.id).toBeGreaterThanOrEqual(4);
+      for (const it of items) {
+        expect(it.sentence).toContain(it.target);
+        expect(new Set(items.map((x) => x.ko)).size).toBe(items.length);
+      }
+    }
+  });
+});
