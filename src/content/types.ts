@@ -30,8 +30,6 @@ export interface Clip {
   topic: Topic;
   level: Cefr;
   emoji: string;
-  /** Tailwind gradient classes for the vertical card background. */
-  gradient: string;
   sentences: Sentence[];
 }
 

@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { BookOpen, Clapperboard, Home, Layers, User } from "lucide-react";
 import { actions, blockingDue, dueCards, newQueue, useData, useHydrated } from "@/lib/store";
 import Onboarding from "./Onboarding";
+import { syncReminderState } from "@/lib/reminders";
 
 const NAV = [
   { href: "/", label: "Today", icon: Home },
@@ -49,6 +50,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   useStudyTimer();
   useServiceWorker();
 
+  // Keep the service worker's copy of "studied today?" fresh for streak reminders.
+  useEffect(() => {
+    if (hydrated) syncReminderState(d);
+  }, [hydrated, d]);
+
   const reviewCount = hydrated ? dueCards(d).length + newQueue(d).length : 0;
   const blocking = hydrated ? blockingDue(d) : 0;
 
@@ -56,8 +62,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <div className="mx-auto flex min-h-dvh max-w-xl flex-col">
       <main className="flex-1 pb-24">{children}</main>
       {hydrated && !d.settings.onboarded && <Onboarding />}
-      <nav className="card pb-safe fixed inset-x-0 bottom-0 z-30 mx-auto max-w-xl rounded-none rounded-t-2xl border-x-0 border-b-0">
-        <ul className="grid grid-cols-5">
+      <nav className="pb-safe fixed inset-x-0 bottom-0 z-30 mx-auto max-w-xl border-t border-line bg-sheet/95 backdrop-blur">
+        <ul className="grid grid-cols-5 px-2">
           {NAV.map(({ href, label, icon: Icon }) => {
             const active =
               href === "/"
@@ -67,16 +73,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <li key={href}>
                 <Link
                   href={href}
-                  className={`relative flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold ${
-                    active ? "text-brand-600 dark:text-brand-400" : "muted"
+                  className={`relative flex flex-col items-center gap-1 py-2 text-[11px] font-medium ${
+                    active ? "text-fg" : "muted"
                   }`}
                 >
-                  <Icon size={22} strokeWidth={active ? 2.5 : 2} />
+                  <span
+                    className={`flex h-9 w-12 items-center justify-center rounded-full transition-colors ${
+                      active ? "bg-ink text-on-ink" : ""
+                    }`}
+                  >
+                    <Icon size={20} strokeWidth={1.75} />
+                  </span>
                   {label}
                   {href === "/review/" && reviewCount > 0 && (
                     <span
-                      className={`absolute top-1 left-1/2 ml-2 min-w-5 rounded-full px-1.5 text-[10px] leading-5 text-white ${
-                        blocking > 0 ? "bg-rose-500" : "bg-brand-500"
+                      className={`absolute top-0.5 left-1/2 ml-3 min-w-5 rounded-full border-2 border-sheet px-1 text-[10px] leading-4 font-semibold text-white ${
+                        blocking > 0 ? "bg-accent" : "bg-fg-2"
                       }`}
                     >
                       {reviewCount}

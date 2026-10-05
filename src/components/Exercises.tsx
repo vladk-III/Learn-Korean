@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Lightbulb, Mic, Square, Turtle, Volume2 } from "lucide-react";
+import { Ear, Lightbulb, Mic, PenLine, Puzzle, Square, Turtle, Volume2 } from "lucide-react";
 import { tokenize } from "@/lib/analyzer";
 import { listenKorean, recognitionSupported, speak, stopSpeaking } from "@/lib/speech";
 import { grade, levenshtein, normalize, shuffle, similarity, syllableDiff, type Verdict } from "@/lib/text";
@@ -13,18 +13,33 @@ export interface ExerciseProps {
   onResult: (v: Verdict | null, detail?: string) => void;
 }
 
-const btnPrimary =
-  "bg-brand-500 w-full rounded-2xl py-4 text-lg font-bold text-white shadow-[0_4px_0_var(--color-brand-700)] active:translate-y-1 active:shadow-none disabled:opacity-40";
+const btnPrimary = "btn btn-ink h-14 w-full text-base";
+const btnStop = "btn btn-accent h-14 w-full text-base";
+
+/** Small exercise label with a line icon, e.g. "Writing · Type the missing word". */
+function Kind({ icon: Icon, skill, task }: { icon: typeof Mic; skill: string; task: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="icon-circle size-10">
+        <Icon size={17} strokeWidth={1.75} />
+      </span>
+      <div>
+        <p className="label">{skill}</p>
+        <p className="font-semibold tracking-tight">{task}</p>
+      </div>
+    </div>
+  );
+}
 
 function Blanked({ card, reveal }: { card: MinedCard; reveal?: boolean }) {
   const i = card.sentence.indexOf(card.target);
-  if (i < 0) return <p className="ko text-xl">{card.sentence}</p>;
+  if (i < 0) return <p className="ko text-[1.4rem] leading-relaxed">{card.sentence}</p>;
   return (
-    <p className="ko text-xl">
+    <p className="ko text-[1.4rem] leading-relaxed">
       {card.sentence.slice(0, i)}
       <span
-        className={`mx-0.5 inline-block min-w-16 rounded-lg border-b-4 px-1 text-center ${
-          reveal ? "border-emerald-500 text-emerald-600" : "border-brand-500 text-transparent"
+        className={`mx-0.5 inline-block min-w-16 rounded-lg border-b-[3px] px-1 text-center ${
+          reveal ? "border-good text-good" : "border-accent text-transparent"
         }`}
       >
         {reveal ? card.target : "＿".repeat(Math.max(2, Array.from(card.target).length))}
@@ -56,7 +71,7 @@ function AnswerInput({ onSubmit, placeholder }: { onSubmit: (v: string) => void;
         autoCorrect="off"
         autoCapitalize="off"
         spellCheck={false}
-        className="card ko w-full px-4 py-3 text-xl"
+        className="tile ko w-full px-5 py-4 text-xl outline-none"
       />
       <button type="submit" className={btnPrimary} disabled={!v.trim()}>
         Check
@@ -76,15 +91,13 @@ export function ClozeExercise({ card, onResult }: ExerciseProps) {
   const [hint, setHint] = useState(false);
   return (
     <div className="space-y-5">
-      <p className="muted text-sm font-bold uppercase">✍️ Type the missing word</p>
+      <Kind icon={PenLine} skill="Writing" task="Type the missing word" />
       <Blanked card={card} />
-      {card.translation && <p className="muted">{card.translation}</p>}
-      <div className="flex items-center gap-2 text-sm">
-        <span className="rounded-full bg-amber-100 px-3 py-1 font-semibold text-amber-900 dark:bg-amber-500/15 dark:text-amber-200">
-          = {card.gloss}
-        </span>
-        <button onClick={() => setHint(true)} className="muted flex items-center gap-1">
-          <Lightbulb size={16} /> {hint ? `starts with ${Array.from(card.target)[0]}` : "Hint"}
+      {card.translation && <p className="sub text-[15px]">{card.translation}</p>}
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <span className="pill">{card.gloss}</span>
+        <button onClick={() => setHint(true)} className="pill pill-outline">
+          <Lightbulb size={13} /> {hint ? `starts with ${Array.from(card.target)[0]}` : "Hint"}
         </button>
       </div>
       <AnswerInput
@@ -108,12 +121,12 @@ export function ListenExercise({ card, rate, onResult }: ExerciseProps) {
   }, [card.id]);
   return (
     <div className="space-y-5">
-      <p className="muted text-sm font-bold uppercase">🎧 Listen and type the missing word</p>
-      <div className="flex justify-center gap-4">
-        <button onClick={() => play()} aria-label="Play" className="bg-brand-500 rounded-full p-6 text-white shadow-lg">
+      <Kind icon={Ear} skill="Listening" task="Type the word you hear" />
+      <div className="flex items-end justify-center gap-3 py-2">
+        <button onClick={() => play()} aria-label="Play" className="flex size-24 items-center justify-center rounded-full bg-ink text-on-ink">
           <Volume2 size={36} />
         </button>
-        <button onClick={() => play(0.6)} aria-label="Play slowly" className="card self-end rounded-full p-4">
+        <button onClick={() => play(0.6)} aria-label="Play slowly" className="icon-circle size-12">
           <Turtle size={24} />
         </button>
       </div>
@@ -149,17 +162,17 @@ export function RebuildExercise({ card, onResult }: ExerciseProps) {
 
   return (
     <div className="space-y-5">
-      <p className="muted text-sm font-bold uppercase">🧩 Rebuild the sentence</p>
-      {card.translation && <p className="text-lg font-semibold">{card.translation}</p>}
+      <Kind icon={Puzzle} skill="Reading" task="Rebuild the sentence" />
+      {card.translation && <p className="text-xl font-semibold tracking-tight">{card.translation}</p>}
       <p className="muted text-sm">
         Target: <b>{card.target}</b> = {card.gloss}
       </p>
-      <div className="hairline flex min-h-24 flex-wrap content-start gap-2 rounded-2xl border-2 border-dashed p-3">
+      <div className="tile flex min-h-28 flex-wrap content-start gap-2 p-3">
         {picked.map((i) => (
           <button
             key={i}
             onClick={() => setPicked((p) => p.filter((x) => x !== i))}
-            className="card animate-pop ko px-3 py-2 text-lg font-semibold"
+            className="animate-pop ko rounded-full bg-ink px-4 py-2 text-lg font-medium text-on-ink"
           >
             {words[i]}
           </button>
@@ -170,7 +183,7 @@ export function RebuildExercise({ card, onResult }: ExerciseProps) {
           <button
             key={i}
             onClick={() => setPicked((p) => [...p, i])}
-            className="card ko px-3 py-2 text-lg font-semibold shadow-[0_3px_0_var(--line)] active:translate-y-0.5 active:shadow-none"
+            className="card ko rounded-full px-4 py-2 text-lg font-medium active:scale-95"
           >
             {words[i]}
           </button>
@@ -243,52 +256,52 @@ export function ShadowExercise({ card, rate, onResult }: ExerciseProps) {
 
   return (
     <div className="space-y-5">
-      <p className="muted text-sm font-bold uppercase">🗣️ Listen, then say the whole sentence</p>
-      <p className="ko text-2xl font-semibold">{card.sentence}</p>
-      {card.translation && <p className="muted">{card.translation}</p>}
+      <Kind icon={Mic} skill="Speaking" task="Listen, then say the whole sentence" />
+      <p className="ko text-[1.6rem] leading-snug font-semibold tracking-tight">{card.sentence}</p>
+      {card.translation && <p className="sub text-[15px]">{card.translation}</p>}
       <div className="flex gap-2">
-        <button onClick={() => speak(card.sentence, { rate })} className="card flex flex-1 items-center justify-center gap-2 py-3 font-semibold">
+        <button onClick={() => speak(card.sentence, { rate })} className="btn btn-soft h-12 flex-1">
           <Volume2 size={18} /> Native
         </button>
-        <button onClick={() => speak(card.sentence, { rate: 0.6 })} className="card flex items-center justify-center gap-2 px-4 py-3 font-semibold">
+        <button onClick={() => speak(card.sentence, { rate: 0.6 })} className="btn btn-soft h-12 px-5">
           <Turtle size={18} />
         </button>
       </div>
 
       {heard && (
-        <p className="ko text-xl">
+        <p className="ko text-[1.4rem]">
           {syllableDiff(card.sentence, heard).map((x, i) => (
-            <span key={i} className={x.ok ? "text-emerald-600" : "text-rose-500 underline"}>
+            <span key={i} className={x.ok ? "text-good" : "text-bad underline"}>
               {x.ch}
             </span>
           ))}
         </p>
       )}
-      {err && <p className="text-sm text-rose-500">{err}</p>}
+      {err && <p className="text-bad text-sm">{err}</p>}
 
       {canRecognize && !err ? (
         state === "listening" ? (
-          <button onClick={() => stopRef.current()} className={`${btnPrimary} flex items-center justify-center gap-2 !bg-rose-500`}>
+          <button onClick={() => stopRef.current()} className={btnStop}>
             <Square size={20} /> Listening… tap when done
           </button>
         ) : (
-          <button onClick={recognize} className={`${btnPrimary} flex items-center justify-center gap-2`}>
+          <button onClick={recognize} className={btnPrimary}>
             <Mic size={22} /> Speak
           </button>
         )
       ) : (
         <div className="space-y-3">
           {state === "recording" ? (
-            <button onClick={() => recorder.current?.stop()} className={`${btnPrimary} flex items-center justify-center gap-2 !bg-rose-500`}>
+            <button onClick={() => recorder.current?.stop()} className={btnStop}>
               <Square size={20} /> Stop recording
             </button>
           ) : (
-            <button onClick={record} className={`${btnPrimary} flex items-center justify-center gap-2`}>
+            <button onClick={record} className={btnPrimary}>
               <Mic size={22} /> {audioUrl ? "Record again" : "Record yourself"}
             </button>
           )}
           {audioUrl && <audio src={audioUrl} controls className="w-full" />}
-          <button onClick={() => onResult(null)} className="card w-full py-3 font-semibold">
+          <button onClick={() => onResult(null)} className="btn btn-line h-12 w-full">
             I said it — rate myself
           </button>
         </div>

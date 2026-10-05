@@ -105,75 +105,86 @@ function ClipCard({
   const cov = coverage(data, clip);
 
   return (
-    <section
-      className={`relative flex h-[calc(100dvh-4.5rem)] snap-start snap-always flex-col bg-gradient-to-b ${clip.gradient} text-white`}
-    >
-      <div className="pt-safe flex items-center justify-between px-4 pt-4">
-        <div>
-          <p className="text-xs font-bold tracking-wide uppercase opacity-80">
-            {clip.level} · {clip.topic}
-          </p>
-          <h2 className="text-xl font-extrabold">{clip.title}</h2>
-          <p className="text-sm opacity-90">{clip.titleEn}</p>
-        </div>
+    <section className="relative flex h-[calc(100dvh-4.75rem)] snap-start snap-always flex-col bg-canvas">
+      <div className="pt-safe flex items-start justify-between px-5 pt-6">
+        <h2 className="display text-[2.1rem]">
+          <span className="ko">{clip.title}</span>
+          <span className="muted block text-[1.4rem]">{clip.titleEn}</span>
+        </h2>
+        <span className="pill pill-soft mt-1.5 shrink-0">{clip.level}</span>
+      </div>
+      <div className="mt-3 flex gap-1.5 px-5">
         <CoverageBadge pct={cov.pct} compact />
+        <span className="pill pill-outline">{clip.topic}</span>
       </div>
 
       <button
         onClick={() => (started ? (playing ? stop() : playLine(line)) : start())}
-        className="flex flex-1 flex-col items-center justify-center"
+        className="flex flex-1 flex-col items-center justify-center pr-14"
         aria-label={playing ? "Pause" : "Play"}
       >
-        <span className={`text-[7rem] leading-none drop-shadow-lg ${playing ? "animate-pulse" : ""}`}>{clip.emoji}</span>
+        <span
+          className={`flex size-44 items-center justify-center rounded-full bg-sheet text-[5.5rem] leading-none shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)] transition-transform ${
+            playing ? "scale-105" : ""
+          }`}
+        >
+          {clip.emoji}
+        </span>
         {!started && (
-          <span className="mt-4 flex items-center gap-2 rounded-full bg-black/30 px-5 py-2.5 font-bold backdrop-blur">
-            <Play size={18} fill="currentColor" /> Tap to play
+          <span className="btn btn-ink mt-6 h-12 px-6">
+            <Play size={17} fill="currentColor" /> Tap to play
           </span>
         )}
         {waiting && (
-          <span className="mt-4 flex items-center gap-2 rounded-full bg-black/30 px-4 py-2 text-sm font-bold">
-            <Mic size={16} /> Your turn — repeat it!
+          <span className="pill mt-6 px-4 py-2 text-sm">
+            <Mic size={15} /> Your turn — repeat it
           </span>
         )}
       </button>
 
-      <div className="absolute right-3 bottom-48 flex flex-col gap-3">
+      <div className="absolute right-4 bottom-56 flex flex-col gap-3">
         {[
-          { icon: playing ? Pause : Play, label: playing ? "Pause" : "Play", on: () => (playing ? stop() : start(line)), active: false },
+          { icon: playing ? Pause : Play, label: playing ? "Pause" : "Play", on: () => (playing ? stop() : start(line)), active: playing },
           { icon: RotateCcw, label: "Replay", on: () => start(0), active: false },
           { icon: Languages, label: "English", on: () => setShowEn((v) => !v), active: showEn },
           { icon: Mic, label: "Shadow", on: () => setShadow((v) => !v), active: shadow },
           { icon: ListChecks, label: "Quiz", on: () => (stop(), setQuiz(true)), active: false },
         ].map(({ icon: Icon, label, on, active: a }) => (
-          <button key={label} onClick={on} className="flex flex-col items-center text-[10px] font-bold">
-            <span className={`rounded-full p-3 backdrop-blur ${a ? "bg-white text-black" : "bg-black/25"}`}>
-              <Icon size={20} />
+          <button key={label} onClick={on} className="flex flex-col items-center gap-1 text-[10px] font-medium">
+            <span
+              className={`flex size-11 items-center justify-center rounded-full transition-colors ${
+                a ? "bg-ink text-on-ink" : "bg-sheet"
+              }`}
+            >
+              <Icon size={18} strokeWidth={1.75} />
             </span>
-            {label}
+            <span className="muted">{label}</span>
           </button>
         ))}
-        <Link href={`/reader/?id=${clip.id}`} className="flex flex-col items-center text-[10px] font-bold">
-          <span className="rounded-full bg-black/25 p-3 backdrop-blur">
-            <FileText size={20} />
+        <Link href={`/reader/?id=${clip.id}`} className="flex flex-col items-center gap-1 text-[10px] font-medium">
+          <span className="flex size-11 items-center justify-center rounded-full bg-sheet">
+            <FileText size={18} strokeWidth={1.75} />
           </span>
-          Script
+          <span className="muted">Script</span>
         </Link>
       </div>
 
-      <div className="px-4 pb-6">
-        <div className="mb-2 flex gap-1">
+      <div className="px-4 pb-4">
+        <div className="mb-3 flex gap-1 px-1">
           {clip.sentences.map((_, i) => (
             <button
               key={i}
               onClick={() => start(i)}
               aria-label={`Line ${i + 1}`}
-              className={`h-1.5 flex-1 rounded-full ${i <= line ? "bg-white" : "bg-white/35"}`}
+              className={`h-1 flex-1 rounded-full transition-colors ${i <= line ? "bg-ink" : "bg-line"}`}
             />
           ))}
         </div>
-        <div className="min-h-32 rounded-2xl bg-black/35 p-4 backdrop-blur">
-          {s.speaker && <p className="text-xs font-bold opacity-70">{s.speaker === "A" ? "🧑‍🍳 Staff / A" : "🙋 Customer / B"}</p>}
-          <p className="text-2xl font-bold">
+        <div className="min-h-36 rounded-[1.75rem] bg-sheet p-5">
+          {s.speaker && (
+            <span className="pill pill-soft mb-1.5">{s.speaker === "A" ? "Speaker A" : "Speaker B"}</span>
+          )}
+          <p className="text-[1.6rem] leading-snug font-semibold tracking-tight">
             <InteractiveSentence
               text={s.ko}
               data={data}
@@ -186,14 +197,14 @@ function ClipCard({
               }}
             />
           </p>
-          {showEn && <p className="mt-1 text-sm opacity-90">{s.en}</p>}
+          {showEn && <p className="sub mt-1 text-[15px]">{s.en}</p>}
         </div>
       </div>
 
       {quiz && <Quiz content={clip} tapped={tapped.current} onClose={() => setQuiz(false)} />}
 
       {sel && (
-        <div className="text-[var(--fg)]">
+        <div>
           <WordSheet
             token={sel}
             sentence={s}
@@ -232,7 +243,7 @@ function Feed() {
   if (!hydrated) return null;
 
   return (
-    <div className="no-scrollbar h-[calc(100dvh-4.5rem)] snap-y snap-mandatory overflow-y-scroll">
+    <div className="no-scrollbar h-[calc(100dvh-4.75rem)] snap-y snap-mandatory overflow-y-scroll">
       {CLIPS.map((c, i) => (
         <div
           key={c.id}

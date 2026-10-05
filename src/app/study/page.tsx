@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Copy, Keyboard, Trophy } from "lucide-react";
+import { Keyboard, Layers, ListChecks, SquareStack, Trophy } from "lucide-react";
+import TopicIcon from "@/components/TopicIcon";
 import { studySets } from "@/lib/study";
 import { useData, useHydrated } from "@/lib/store";
 
@@ -12,51 +13,60 @@ export default function Study() {
   const sets = studySets(d);
 
   return (
-    <div className="pt-safe px-4">
-      <h1 className="pt-5 text-2xl font-extrabold">공부 Study</h1>
-      <p className="muted text-sm">
-        Flip flashcards or race the clock typing words. Practice here is extra — it doesn&apos;t change your review
-        schedule, but you can send words you miss to your review deck.
-      </p>
+    <div className="pt-safe">
+      <header className="flex items-start justify-between px-5 pt-6 pb-7">
+        <h1 className="display text-[2.6rem]">
+          Study
+          <span className="muted block">공부</span>
+        </h1>
+        <Link href="/review/" aria-label="Back to review" className="mt-1 flex size-12 items-center justify-center rounded-full bg-sheet">
+          <Layers size={20} strokeWidth={1.75} />
+        </Link>
+      </header>
 
-      <ul className="mt-4 space-y-3">
-        {sets.map((s) => {
-          const best = Math.max(d.bestScores[`${s.id}:meaning`] ?? 0, d.bestScores[`${s.id}:listen`] ?? 0);
-          return (
-            <li key={s.id} className="card p-4">
-              <div className="flex items-start gap-3">
-                <span className="text-3xl leading-none">{s.emoji}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="ko leading-snug font-bold">{s.title}</p>
-                  <p className="muted truncate text-xs">{s.subtitle}</p>
-                  <p className="muted mt-0.5 flex items-center gap-2 text-xs font-semibold">
-                    {s.items.length} words
+      <div className="sheet min-h-[75dvh] px-5 pt-6 pb-6">
+        <p className="sub text-[15px]">
+          Flip flashcards or race the clock. Practice here doesn&apos;t change your review schedule, but you can send
+          words you miss to your reviews.
+        </p>
+
+        <ul className="mt-5 space-y-3">
+          {sets.map((s) => {
+            const best = Math.max(d.bestScores[`${s.id}:meaning`] ?? 0, d.bestScores[`${s.id}:listen`] ?? 0);
+            return (
+              <li key={s.id} className="card p-4">
+                <div className="flex items-center gap-4">
+                  {s.topic ? (
+                    <TopicIcon topic={s.topic} />
+                  ) : (
+                    <span className="icon-circle size-12">
+                      {s.id === "missed" ? <ListChecks size={20} strokeWidth={1.75} /> : <Layers size={20} strokeWidth={1.75} />}
+                    </span>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="ko truncate leading-snug font-semibold">{s.title}</p>
+                    <p className="muted truncate text-sm">{s.subtitle}</p>
+                  </div>
+                  <span className="pill pill-outline shrink-0">{s.items.length} words</span>
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <Link href={`/study/flashcards/?set=${encodeURIComponent(s.id)}`} className="btn btn-ink h-11 text-sm">
+                    <SquareStack size={16} strokeWidth={1.75} /> Flashcards
+                  </Link>
+                  <Link href={`/study/type/?set=${encodeURIComponent(s.id)}`} className="btn btn-soft h-11 text-sm">
+                    <Keyboard size={16} strokeWidth={1.75} /> Type It!
                     {best > 0 && (
-                      <span className="flex items-center gap-1 text-amber-600">
-                        <Trophy size={12} /> {best}
+                      <span className="muted flex items-center gap-0.5 text-xs">
+                        <Trophy size={11} /> {best}
                       </span>
                     )}
-                  </p>
+                  </Link>
                 </div>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <Link
-                  href={`/study/flashcards/?set=${encodeURIComponent(s.id)}`}
-                  className="bg-brand-500 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold text-white"
-                >
-                  <Copy size={16} /> Flashcards
-                </Link>
-                <Link
-                  href={`/study/type/?set=${encodeURIComponent(s.id)}`}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-amber-500 py-2.5 text-sm font-bold text-white"
-                >
-                  <Keyboard size={16} /> Type It!
-                </Link>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </div>
   );
 }

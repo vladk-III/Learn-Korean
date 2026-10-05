@@ -13,7 +13,6 @@ export const CLIPS: Clip[] = [
     topic: "Life",
     level: "A1",
     emoji: "👋",
-    gradient: "from-pink-500 to-orange-400",
     sentences: [
       { ko: "안녕하세요!", en: "Hello!" },
       { ko: "제 이름은 민수예요.", en: "My name is Minsu." },
@@ -31,7 +30,6 @@ export const CLIPS: Clip[] = [
     topic: "Life",
     level: "A1",
     emoji: "🏪",
-    gradient: "from-emerald-500 to-teal-600",
     sentences: [
       { ko: "어서 오세요!", en: "Welcome!", speaker: "A" },
       { ko: "이거 얼마예요?", en: "How much is this?", speaker: "B" },
@@ -49,7 +47,6 @@ export const CLIPS: Clip[] = [
     topic: "Life",
     level: "A1",
     emoji: "🧋",
-    gradient: "from-amber-500 to-rose-500",
     sentences: [
       { ko: "주문하시겠어요?", en: "Are you ready to order?", speaker: "A" },
       { ko: "아이스 아메리카노 한 잔 주세요.", en: "One iced americano, please.", speaker: "B" },
@@ -66,7 +63,6 @@ export const CLIPS: Clip[] = [
     topic: "Life",
     level: "A1",
     emoji: "🌤️",
-    gradient: "from-sky-500 to-indigo-500",
     sentences: [
       { ko: "안녕하세요, 오늘의 날씨입니다.", en: "Hello, here is today's weather." },
       { ko: "오늘 서울은 맑고 따뜻하겠습니다.", en: "Seoul will be clear and warm today." },
@@ -83,7 +79,6 @@ export const CLIPS: Clip[] = [
     topic: "Life",
     level: "A2",
     emoji: "🗺️",
-    gradient: "from-violet-500 to-fuchsia-500",
     sentences: [
       { ko: "실례합니다.", en: "Excuse me.", speaker: "B" },
       { ko: "지하철역이 어디에 있어요?", en: "Where is the subway station?", speaker: "B" },
@@ -101,7 +96,6 @@ export const CLIPS: Clip[] = [
     topic: "Culture",
     level: "A2",
     emoji: "🍗",
-    gradient: "from-cyan-500 to-blue-600",
     sentences: [
       { ko: "오늘은 친구랑 한강 공원에 왔어요.", en: "Today I came to Hangang Park with a friend." },
       { ko: "날씨가 정말 좋아요.", en: "The weather is really nice." },
@@ -118,7 +112,6 @@ export const CLIPS: Clip[] = [
     topic: "Society",
     level: "A2",
     emoji: "🚉",
-    gradient: "from-lime-500 to-green-700",
     sentences: [
       { ko: "이번 역은 강남, 강남역입니다.", en: "This stop is Gangnam, Gangnam Station." },
       { ko: "내리실 문은 오른쪽입니다.", en: "The doors will open on the right." },
@@ -134,7 +127,6 @@ export const CLIPS: Clip[] = [
     topic: "Culture",
     level: "A2",
     emoji: "🍙",
-    gradient: "from-orange-500 to-red-600",
     sentences: [
       { ko: "오늘은 김밥을 만들어 볼게요.", en: "Today I'll try making gimbap." },
       { ko: "먼저 밥에 참기름과 소금을 넣어요.", en: "First, add sesame oil and salt to the rice." },

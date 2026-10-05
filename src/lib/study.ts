@@ -1,7 +1,7 @@
 /** Study sets for flashcards and the typing game (Quizlet-style practice). */
 import { ARTICLES } from "@/content/articles";
 import { CLIPS } from "@/content/clips";
-import type { Content } from "@/content/types";
+import type { Content, Topic } from "@/content/types";
 import { tokenize } from "./analyzer";
 import { State } from "./fsrs";
 import type { Data } from "./store";
@@ -27,6 +27,8 @@ export interface StudySet {
   title: string;
   subtitle: string;
   emoji: string;
+  /** Content sets carry their topic (for the icon); deck sets don't. */
+  topic?: Topic;
   items: StudyItem[];
 }
 
@@ -98,6 +100,7 @@ export function studySets(d: Data): StudySet[] {
         title: c.title,
         subtitle: `${c.kind === "clip" ? "Clip" : "News"} · ${c.level} · ${c.titleEn}`,
         emoji: c.emoji,
+        topic: c.topic,
         items,
       });
   }

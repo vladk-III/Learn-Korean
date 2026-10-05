@@ -30,6 +30,8 @@ export interface Settings {
   dailyGoalMin: number;
   ttsRate: number;
   skills: Record<Skill, boolean>;
+  /** Streak reminder times (local hours) and the setup code once enabled. */
+  reminders: { hours: number[]; code?: string };
 }
 
 export interface MinedCard {
@@ -97,6 +99,7 @@ export const DEFAULT_SETTINGS: Settings = {
   dailyGoalMin: 20,
   ttsRate: 0.9,
   skills: { reading: true, writing: true, listening: true, speaking: true },
+  reminders: { hours: [20, 22] },
 };
 
 const KEY = "learn-korean:v1";
@@ -199,11 +202,17 @@ export function today(d: Data): DayStats {
   return d.days[dayKey()] ?? { reviews: 0, newCards: 0, mined: 0, seconds: 0 };
 }
 
+/** A day counts toward the streak once you've done a review or ~2 minutes of study. */
+export function isActiveDay(s: DayStats | undefined): boolean {
+  return !!s && (s.reviews > 0 || s.seconds >= 120);
+}
+
+export function activeToday(d: Data): boolean {
+  return isActiveDay(d.days[dayKey()]);
+}
+
 export function streak(d: Data): number {
-  const active = (k: string) => {
-    const s = d.days[k];
-    return !!s && (s.reviews > 0 || s.seconds >= 120);
-  };
+  const active = (k: string) => isActiveDay(d.days[k]);
   let n = 0;
   const cur = new Date();
   if (!active(dayKey(cur.getTime()))) cur.setDate(cur.getDate() - 1); // today not done yet

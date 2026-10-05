@@ -2,7 +2,20 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { BookOpen, Clapperboard, ListChecks, PartyPopper, Volume2, X } from "lucide-react";
+import {
+  BookOpen,
+  ChevronRight,
+  Clapperboard,
+  Ear,
+  Mic,
+  PenLine,
+  Puzzle,
+  Shuffle,
+  SquareStack,
+  Volume2,
+  X,
+} from "lucide-react";
+import Arc from "@/components/Arc";
 import { Rating, State, formatInterval } from "@/lib/fsrs";
 import { speak } from "@/lib/speech";
 import { tokenize } from "@/lib/analyzer";
@@ -21,20 +34,13 @@ import {
 } from "@/lib/store";
 import { ClozeExercise, ListenExercise, RebuildExercise, ShadowExercise } from "@/components/Exercises";
 
-const FOCUS: { v: Skill | undefined; label: string; emoji: string }[] = [
-  { v: undefined, label: "Mixed", emoji: "🎯" },
-  { v: "reading", label: "Reading", emoji: "🧩" },
-  { v: "writing", label: "Writing", emoji: "✍️" },
-  { v: "listening", label: "Listening", emoji: "🎧" },
-  { v: "speaking", label: "Speaking", emoji: "🗣️" },
+const FOCUS: { v: Skill | undefined; label: string; icon: typeof Mic }[] = [
+  { v: undefined, label: "Mixed", icon: Shuffle },
+  { v: "reading", label: "Reading", icon: Puzzle },
+  { v: "writing", label: "Writing", icon: PenLine },
+  { v: "listening", label: "Listening", icon: Ear },
+  { v: "speaking", label: "Speaking", icon: Mic },
 ];
-
-const RATING_STYLE: Record<Rating, string> = {
-  [Rating.Again]: "bg-rose-500",
-  [Rating.Hard]: "bg-amber-500",
-  [Rating.Good]: "bg-emerald-500",
-  [Rating.Easy]: "bg-sky-500",
-};
 
 const VERDICT_TO_RATING: Record<Verdict, Rating> = {
   correct: Rating.Good,
@@ -85,125 +91,174 @@ export default function Review() {
   if (!queue) {
     const total = due.length + fresh.length;
     return (
-      <div className="pt-safe px-4">
-        <div className="flex items-end justify-between pt-5">
-          <h1 className="text-2xl font-extrabold">복습 Review</h1>
-          <Link href="/study/" className="card flex items-center gap-1.5 px-3 py-2 text-sm font-bold">
-            🃏 Flashcards &amp; games
-          </Link>
-        </div>
-        <p className="muted text-sm">Active recall with FSRS spacing. Reviews first, then new cards.</p>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <div className="card p-4">
-            <p className="text-3xl font-extrabold text-rose-500">{due.length}</p>
-            <p className="muted text-sm">due reviews</p>
-          </div>
-          <div className="card p-4">
-            <p className="text-brand-500 text-3xl font-extrabold">{fresh.length}</p>
-            <p className="muted text-sm">
-              new today (cap {d.settings.newPerDay})
-            </p>
-          </div>
-        </div>
-
-        <h2 className="mt-6 mb-2 text-sm font-bold tracking-wide uppercase">Skill focus</h2>
-        <div className="grid grid-cols-5 gap-2">
-          {FOCUS.map((f) => (
-            <button
-              key={f.label}
-              onClick={() => setFocus(f.v)}
-              className={`flex flex-col items-center rounded-2xl border-2 py-3 text-[11px] font-bold ${
-                focus === f.v ? "border-brand-500 bg-brand-50 dark:bg-brand-500/10" : "hairline"
-              }`}
-            >
-              <span className="text-2xl">{f.emoji}</span>
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        {total > 0 ? (
-          <button
-            onClick={() => start()}
-            className="bg-brand-500 mt-6 w-full rounded-2xl py-4 text-lg font-bold text-white shadow-[0_4px_0_var(--color-brand-700)] active:translate-y-1 active:shadow-none"
+      <div className="pt-safe">
+        <header className="flex items-start justify-between px-5 pt-6 pb-7">
+          <h1 className="display text-[2.6rem]">
+            Review
+            <span className="muted block">복습</span>
+          </h1>
+          <Link
+            href="/study/"
+            aria-label="Flashcards and games"
+            className="mt-1 flex size-12 items-center justify-center rounded-full bg-sheet"
           >
-            Start {total} card{total > 1 ? "s" : ""}
-          </button>
-        ) : (
-          <div className="card mt-6 p-5 text-center">
-            <p className="text-4xl">🌱</p>
-            <p className="mt-2 font-bold">Nothing due right now</p>
-            <p className="muted text-sm">
-              {d.cards.length === 0
-                ? "Tap words in a news story or clip and press “Mine sentence” to build your deck."
-                : "Go read or watch something new and mine a few sentences."}
-            </p>
-            <div className="mt-4 flex gap-2">
-              <Link href="/news/" className="card flex flex-1 items-center justify-center gap-2 py-3 font-semibold">
-                <BookOpen size={18} /> News
-              </Link>
-              <Link href="/clips/" className="card flex flex-1 items-center justify-center gap-2 py-3 font-semibold">
-                <Clapperboard size={18} /> Clips
-              </Link>
+            <SquareStack size={20} strokeWidth={1.75} />
+          </Link>
+        </header>
+
+        <div className="sheet min-h-[75dvh] px-5 pt-6 pb-6">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="tile flex min-h-36 flex-col justify-between p-4">
+              <div className="flex items-start justify-between">
+                <p className="leading-tight font-medium">
+                  Due
+                  <br />
+                  reviews
+                </p>
+                <Arc value={due.length ? 0.25 : 1} />
+              </div>
+              <p className="num-thin text-[2.6rem] leading-none">{due.length}</p>
+            </div>
+            <div className="tile flex min-h-36 flex-col justify-between p-4">
+              <div className="flex items-start justify-between">
+                <p className="leading-tight font-medium">
+                  New
+                  <br />
+                  today
+                </p>
+                <Arc value={1 - fresh.length / Math.max(1, d.settings.newPerDay)} />
+              </div>
+              <p className="num-thin text-[2.6rem] leading-none">
+                {fresh.length}
+                <span className="muted text-2xl">/{d.settings.newPerDay}</span>
+              </p>
             </div>
           </div>
-        )}
 
-        {missed.length > 0 && (
-          <section className="mt-8">
-            <h2 className="mb-2 flex items-center gap-2 text-sm font-bold tracking-wide uppercase">
-              <ListChecks size={16} /> Missed in quizzes ({missed.length})
-            </h2>
-            <div className="card divide-y divide-[var(--line)]">
-              {missed.slice(0, 30).map((c) => (
-                <div key={c.id} className="flex items-center gap-3 px-4 py-2.5">
-                  <button onClick={() => speak(c.target, { rate: d.settings.ttsRate })} aria-label="Play" className="text-brand-500">
-                    <Volume2 size={16} />
-                  </button>
-                  <div className="min-w-0 flex-1">
-                    <p className="ko font-bold">{c.lemma}</p>
-                    <p className="muted truncate text-xs">{c.gloss}</p>
-                  </div>
-                  <span className="muted shrink-0 text-xs">
-                    {c.fsrs.state === State.New ? "new" : c.fsrs.due <= now ? "due" : `in ${formatInterval(c.fsrs.due - now)}`}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => start(missedReady.map((c) => c.id))}
-              disabled={missedReady.length === 0}
-              className="mt-3 w-full rounded-2xl bg-amber-500 py-3.5 font-bold text-white shadow-[0_4px_0_#b45309] active:translate-y-1 active:shadow-none disabled:opacity-40"
-            >
-              {missedReady.length ? `Practise ${missedReady.length} missed word${missedReady.length > 1 ? "s" : ""}` : "All scheduled — nothing due yet"}
+          <p className="label mt-7">Skill focus</p>
+          <div className="no-scrollbar -mx-5 mt-2 flex gap-1 overflow-x-auto px-5">
+            {FOCUS.map((f) => (
+              <button
+                key={f.label}
+                onClick={() => setFocus(f.v)}
+                aria-pressed={focus === f.v}
+                className="chip flex items-center gap-1.5"
+              >
+                <f.icon size={15} strokeWidth={1.75} />
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {total > 0 ? (
+            <button onClick={() => start()} className="btn btn-ink mt-6 h-14 w-full text-base">
+              Start {total} card{total > 1 ? "s" : ""}
             </button>
-          </section>
-        )}
+          ) : (
+            <div className="tile mt-6 p-5">
+              <p className="text-lg font-semibold tracking-tight">Nothing due right now</p>
+              <p className="muted mt-0.5 text-[15px]">
+                {d.cards.length === 0
+                  ? "Tap words in a story or clip and save the sentence to build your deck."
+                  : "Read or watch something new and save a few sentences."}
+              </p>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <Link href="/news/" className="btn btn-ink h-12">
+                  <BookOpen size={17} strokeWidth={1.75} /> News
+                </Link>
+                <Link href="/clips/" className="btn bg-sheet h-12">
+                  <Clapperboard size={17} strokeWidth={1.75} /> Clips
+                </Link>
+              </div>
+            </div>
+          )}
+
+          <Link href="/study/" className="card mt-3 flex items-center gap-4 px-4 py-4">
+            <span className="icon-circle size-12">
+              <SquareStack size={20} strokeWidth={1.75} />
+            </span>
+            <div className="flex-1">
+              <p className="font-semibold">Flashcards &amp; Type It!</p>
+              <p className="muted text-[15px]">Extra practice, any time</p>
+            </div>
+            <ChevronRight size={18} className="muted" />
+          </Link>
+
+          {missed.length > 0 && (
+            <section className="mt-9">
+              <div className="flex items-baseline justify-between">
+                <h2 className="text-2xl font-semibold tracking-tight">Missed in quizzes</h2>
+                <span className="muted text-[15px]">{missed.length}</span>
+              </div>
+              <ul className="mt-3 space-y-2">
+                {missed.slice(0, 30).map((c) => (
+                  <li key={c.id} className="card flex items-center gap-3 px-4 py-3">
+                    <button
+                      onClick={() => speak(c.target, { rate: d.settings.ttsRate })}
+                      aria-label="Play"
+                      className="icon-circle size-10"
+                    >
+                      <Volume2 size={16} strokeWidth={1.75} />
+                    </button>
+                    <div className="min-w-0 flex-1">
+                      <p className="ko font-semibold">{c.lemma}</p>
+                      <p className="muted truncate text-sm">{c.gloss}</p>
+                    </div>
+                    <span className={c.fsrs.state === State.New || c.fsrs.due <= now ? "pill" : "pill pill-outline"}>
+                      {c.fsrs.state === State.New ? "new" : c.fsrs.due <= now ? "due" : formatInterval(c.fsrs.due - now)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => start(missedReady.map((c) => c.id))}
+                disabled={missedReady.length === 0}
+                className="btn btn-accent mt-3 h-13 w-full py-3.5"
+              >
+                {missedReady.length
+                  ? `Practise ${missedReady.length} missed word${missedReady.length > 1 ? "s" : ""}`
+                  : "All scheduled — nothing due yet"}
+              </button>
+            </section>
+          )}
+        </div>
       </div>
     );
   }
 
   // ---------- finished ----------
   if (!card || !exercise) {
+    const pct = stats.done ? Math.round((stats.correct / stats.done) * 100) : 0;
     return (
-      <div className="pt-safe flex flex-col items-center px-6 pt-16 text-center">
-        <PartyPopper size={64} className="text-amber-500" />
-        <h1 className="mt-4 text-3xl font-extrabold">수고했어요!</h1>
-        <p className="muted">Session complete</p>
-        <p className="mt-4 text-lg">
-          {stats.done} reviews · {stats.done ? Math.round((stats.correct / stats.done) * 100) : 0}% recalled
-        </p>
-        <p className="muted mt-2 text-sm">Mining is unlocked. Find your next i+1 sentence:</p>
-        <div className="mt-6 flex w-full gap-2">
-          <Link href="/news/" className="bg-brand-500 flex flex-1 items-center justify-center gap-2 rounded-2xl py-3 font-bold text-white">
-            <BookOpen size={18} /> News
+      <div className="pt-safe px-5 pt-12">
+        <h1 className="display text-[2.6rem]">
+          수고했어요
+          <span className="muted block">Session done</span>
+        </h1>
+        <div className="mt-8 grid grid-cols-2 gap-3">
+          <div className="tile p-4">
+            <p className="font-medium">Reviewed</p>
+            <p className="num-thin mt-6 text-[2.6rem] leading-none">{stats.done}</p>
+          </div>
+          <div className="tile p-4">
+            <p className="font-medium">Recalled</p>
+            <p className="num-thin mt-6 text-[2.6rem] leading-none">
+              {pct}
+              <span className="muted text-2xl">%</span>
+            </p>
+          </div>
+        </div>
+        <p className="sub mt-6 text-[15px]">Saving is unlocked. Find your next i+1 sentence:</p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <Link href="/news/" className="btn btn-ink h-13 py-3.5">
+            <BookOpen size={17} strokeWidth={1.75} /> News
           </Link>
-          <Link href="/clips/" className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-fuchsia-500 py-3 font-bold text-white">
-            <Clapperboard size={18} /> Clips
+          <Link href="/clips/" className="btn btn-line h-13 py-3.5">
+            <Clapperboard size={17} strokeWidth={1.75} /> Clips
           </Link>
         </div>
-        <button onClick={() => setQueue(null)} className="muted mt-6 text-sm underline">
-          Back to review overview
+        <button onClick={() => setQueue(null)} className="muted mt-6 w-full text-center text-sm">
+          Back to review
         </button>
       </div>
     );
@@ -228,15 +283,15 @@ export default function Review() {
   const progress = stats.done / (stats.done + queue.length);
 
   return (
-    <div className="pt-safe px-4">
-      <div className="flex items-center gap-3 pt-4">
-        <button onClick={() => setQueue(null)} aria-label="End session" className="muted p-1">
-          <X />
+    <div className="pt-safe px-5 pb-36">
+      <div className="flex items-center gap-3 pt-5">
+        <button onClick={() => setQueue(null)} aria-label="End session" className="icon-circle size-10 bg-sheet">
+          <X size={18} strokeWidth={1.75} />
         </button>
-        <div className="h-3 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
-          <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${progress * 100}%` }} />
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
+          <div className="h-full rounded-full bg-ink transition-all" style={{ width: `${progress * 100}%` }} />
         </div>
-        <span className="muted text-sm font-bold">{queue.length}</span>
+        <span className="label tabular-nums">{queue.length} left</span>
       </div>
 
       <div className="mt-6" key={`${card.id}-${card.fsrs.reps}`}>
@@ -251,62 +306,68 @@ export default function Review() {
             <ShadowExercise {...props} />
           )
         ) : (
-          <div className="animate-pop space-y-4">
-            <div
-              className={`rounded-2xl p-4 font-bold ${
-                result.v === "correct"
-                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300"
-                  : result.v === "close"
-                    ? "bg-amber-100 text-amber-900 dark:bg-amber-500/15 dark:text-amber-200"
-                    : result.v === "wrong"
-                      ? "bg-rose-100 text-rose-800 dark:bg-rose-500/15 dark:text-rose-300"
-                      : "card"
-              }`}
-            >
-              {result.v === "correct" ? "정답! Correct" : result.v === "close" ? "Almost!" : result.v === "wrong" ? "Not quite" : "How did it go?"}
-              {result.detail && <p className="mt-1 text-sm font-medium">{result.detail}</p>}
+          <div className="animate-pop space-y-3">
+            <div className="flex items-center gap-3">
+              <span
+                className={`pill ${
+                  result.v === "correct" ? "bg-good" : result.v === "close" ? "" : result.v === "wrong" ? "bg-bad" : "pill-soft"
+                }`}
+              >
+                {result.v === "correct" ? "Correct" : result.v === "close" ? "Almost" : result.v === "wrong" ? "Not quite" : "Self-check"}
+              </span>
+              {result.detail && <p className="sub min-w-0 flex-1 text-sm">{result.detail}</p>}
             </div>
-            <div className="card p-4">
-              <div className="flex items-start gap-2">
-                <button onClick={() => speak(card.sentence, { rate: d.settings.ttsRate })} aria-label="Play" className="text-brand-500 mt-1.5">
-                  <Volume2 size={20} />
+            <div className="card p-5">
+              <div className="flex items-start gap-3">
+                <button
+                  onClick={() => speak(card.sentence, { rate: d.settings.ttsRate })}
+                  aria-label="Play"
+                  className="icon-circle size-10"
+                >
+                  <Volume2 size={17} strokeWidth={1.75} />
                 </button>
                 <div>
                   <p className="ko text-xl">
                     {card.sentence.split(card.target).map((part, i, arr) => (
                       <span key={i}>
                         {part}
-                        {i < arr.length - 1 && <b className="text-brand-600 dark:text-brand-400">{card.target}</b>}
+                        {i < arr.length - 1 && <b className="rounded-md bg-accent-soft px-0.5">{card.target}</b>}
                       </span>
                     ))}
                   </p>
-                  {card.translation && <p className="muted">{card.translation}</p>}
+                  {card.translation && <p className="sub text-[15px]">{card.translation}</p>}
                 </div>
               </div>
-              <p className="mt-3 text-sm">
-                <b>{card.lemma}</b> — {card.gloss}
-              </p>
-              {card.notes.length > 0 && <p className="muted text-xs">{card.notes.join(" · ")}</p>}
-              <p className="muted mt-2 text-xs">from {card.sourceTitle}</p>
+              <div className="tile mt-4 px-4 py-3">
+                <p className="text-[15px]">
+                  <b className="ko">{card.lemma}</b> <span className="muted">—</span> {card.gloss}
+                </p>
+                {card.notes.length > 0 && <p className="muted text-xs">{card.notes.join(" · ")}</p>}
+              </div>
+              <p className="label mt-3">from {card.sourceTitle}</p>
             </div>
           </div>
         )}
       </div>
 
       {result && (
-        <div className="pb-safe fixed inset-x-0 bottom-20 z-20 mx-auto grid max-w-xl grid-cols-4 gap-2 px-4">
-          {([Rating.Again, Rating.Hard, Rating.Good, Rating.Easy] as Rating[]).map((r) => (
-            <button
-              key={r}
-              onClick={() => rate(r)}
-              className={`${RATING_STYLE[r]} rounded-2xl py-3 text-white transition-transform ${
-                suggested === r ? "ring-4 ring-black/20 dark:ring-white/40 scale-105" : suggested ? "opacity-70" : ""
-              }`}
-            >
-              <span className="block text-sm font-extrabold">{Rating[r]}</span>
-              <span className="block text-xs opacity-90">{formatInterval(previews[r].card.due - Date.now())}</span>
-            </button>
-          ))}
+        <div className="fixed inset-x-0 bottom-24 z-20 mx-auto max-w-xl px-5">
+          <div className="grid grid-cols-4 gap-1.5 rounded-full bg-sheet p-1.5 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.25)]">
+            {([Rating.Again, Rating.Hard, Rating.Good, Rating.Easy] as Rating[]).map((r) => (
+              <button
+                key={r}
+                onClick={() => rate(r)}
+                className={`rounded-full py-2.5 transition-colors ${
+                  suggested === r ? "bg-ink text-on-ink" : r === Rating.Again ? "text-accent" : ""
+                }`}
+              >
+                <span className="block text-sm font-semibold">{Rating[r]}</span>
+                <span className={`block text-xs ${suggested === r ? "opacity-60" : "muted"}`}>
+                  {formatInterval(previews[r].card.due - Date.now())}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

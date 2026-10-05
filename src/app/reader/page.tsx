@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Eye, EyeOff, Languages, ListChecks, Pause, Play, Volume2 } from "lucide-react";
+import { Eye, EyeOff, Languages, ListChecks, Pause, Play, Volume2 } from "lucide-react";
 import InteractiveSentence from "@/components/InteractiveSentence";
 import WordSheet from "@/components/WordSheet";
 import CoverageBadge from "@/components/CoverageBadge";
+import PageHeader from "@/components/PageHeader";
 import Quiz from "@/components/Quiz";
 import type { Token } from "@/lib/analyzer";
 import { speak, stopSpeaking } from "@/lib/speech";
@@ -66,7 +67,7 @@ function Reader() {
     return (
       <div className="p-6">
         <p>Article not found.</p>
-        <Link href="/news/" className="text-brand-600 font-semibold">
+        <Link href="/news/" className="font-semibold underline">
           Back to news
         </Link>
       </div>
@@ -76,61 +77,56 @@ function Reader() {
   const lastQuiz = [...d.quizzes].reverse().find((q) => q.contentId === content.id);
   const kind = content.kind;
 
+  const iconBtn = (on: boolean) =>
+    `flex size-10 items-center justify-center rounded-full transition-colors ${on ? "bg-ink text-on-ink" : "bg-sheet"}`;
+
   return (
     <div className="pt-safe">
-      <header className="sticky top-0 z-20 bg-[var(--bg)]/90 px-4 pt-4 pb-3 backdrop-blur">
-        <div className="flex items-center gap-2">
-          <Link href={kind === "clip" ? "/clips/" : "/news/"} aria-label="Back" className="p-1">
-            <ArrowLeft />
-          </Link>
-          <div className="min-w-0 flex-1">
-            <div className="muted text-xs font-semibold">
-              {content.level} · {content.topic}
-            </div>
-            <CoverageBadge pct={cov.pct} />
-          </div>
-          <button onClick={() => setHighlight((h) => !h)} aria-label="Toggle unknown-word highlights" className="card p-2">
-            {highlight ? <Eye size={18} /> : <EyeOff size={18} />}
-          </button>
-          <button
-            onClick={() => setShowEn((s) => !s)}
-            aria-label="Toggle translations"
-            className={`card p-2 ${showEn ? "text-brand-600 dark:text-brand-400" : ""}`}
-          >
-            <Languages size={18} />
-          </button>
+      <div className="sticky top-0 z-20 bg-canvas/90 backdrop-blur">
+        <PageHeader
+          back={kind === "clip" ? "/clips/" : "/news/"}
+          title={kind === "clip" ? "Script" : "Reading"}
+          subtitle={`${content.level} · ${content.topic}`}
+          right={
+            <>
+              <button onClick={() => setHighlight((h) => !h)} aria-label="Toggle unknown-word highlights" className={iconBtn(highlight)}>
+                {highlight ? <Eye size={17} strokeWidth={1.75} /> : <EyeOff size={17} strokeWidth={1.75} />}
+              </button>
+              <button onClick={() => setShowEn((v) => !v)} aria-label="Toggle translations" className={iconBtn(showEn)}>
+                <Languages size={17} strokeWidth={1.75} />
+              </button>
+            </>
+          }
+        />
+      </div>
+
+      <div className="px-5 pt-3 pb-7">
+        <p className="label">{content.kind === "news" ? content.date : "Short clip"}</p>
+        <h1 className="ko display mt-1 text-[2rem] leading-tight">{content.title}</h1>
+        <p className="muted mt-1 text-[15px]">{content.titleEn}</p>
+        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+          <CoverageBadge pct={cov.pct} />
+          {highlight && (
+            <span className="pill pill-outline">
+              <span className="underline decoration-accent decoration-dotted decoration-2 underline-offset-4">new</span>·
+              <span className="underline decoration-fg-2 decoration-2 underline-offset-4">learning</span>
+            </span>
+          )}
         </div>
-      </header>
+      </div>
 
-      <article className="px-4 pb-32">
-        <div className="text-5xl">{content.emoji}</div>
-        <h1 className="ko mt-2 text-2xl font-extrabold">{content.title}</h1>
-        <p className="muted text-sm">{content.titleEn}</p>
-        {highlight && (
-          <p className="muted mt-2 text-xs">
-            <span className="underline decoration-amber-500 decoration-dotted decoration-2 underline-offset-4">new</span>{" "}
-            · <span className="underline decoration-sky-500 decoration-2 underline-offset-4">learning</span> · tap any
-            word
-          </p>
-        )}
-
-        <div className="mt-5 space-y-3">
+      <article className="sheet min-h-[60dvh] px-5 pt-6 pb-40">
+        <div className="space-y-2">
           {content.sentences.map((s, i) => (
             <p
               key={i}
               ref={(el) => {
                 lineRefs.current[i] = el;
               }}
-              className={`-mx-2 rounded-xl px-2 py-1 text-[1.2rem] transition-colors ${
-                current === i ? "bg-brand-100 dark:bg-brand-500/20" : ""
-              }`}
+              className={`-mx-3 rounded-2xl px-3 py-1.5 text-[1.2rem] transition-colors ${current === i ? "bg-accent-soft" : ""}`}
             >
-              <button
-                onClick={() => playFrom(i, false)}
-                aria-label="Play sentence"
-                className="muted mr-1 inline-flex align-middle"
-              >
-                <Volume2 size={16} />
+              <button onClick={() => playFrom(i, false)} aria-label="Play sentence" className="muted mr-1 inline-flex align-middle">
+                <Volume2 size={16} strokeWidth={1.75} />
               </button>
               <InteractiveSentence
                 text={s.ko}
@@ -143,26 +139,33 @@ function Reader() {
                   setSel({ token, i });
                 }}
               />
-              {showEn && s.en && <span className="muted block text-sm">{s.en}</span>}
+              {showEn && s.en && <span className="muted block text-[15px] leading-snug">{s.en}</span>}
             </p>
           ))}
         </div>
 
-        <div className="card mt-8 p-4 text-center">
-          <p className="font-bold">Finished reading?</p>
-          <p className="muted text-sm">
-            {lastQuiz
-              ? `Last quiz: ${lastQuiz.score}/${lastQuiz.total}. Take it again to check what stuck.`
-              : "Take a 1-minute quiz. Missed words go to your review deck."}
-          </p>
+        <div className="tile mt-10 p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-lg font-semibold tracking-tight">Finished reading?</p>
+              <p className="muted text-[15px]">
+                {lastQuiz
+                  ? `Last quiz ${lastQuiz.score}/${lastQuiz.total} — see what stuck this time.`
+                  : "A 1-minute quiz. Missed words go to your reviews."}
+              </p>
+            </div>
+            <span className="icon-circle bg-sheet">
+              <ListChecks size={20} strokeWidth={1.75} />
+            </span>
+          </div>
           <button
             onClick={() => {
               stop();
               setQuiz(true);
             }}
-            className="bg-brand-500 mt-3 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 font-bold text-white shadow-[0_4px_0_var(--color-brand-700)] active:translate-y-1 active:shadow-none"
+            className="btn btn-ink mt-4 h-12 w-full"
           >
-            <ListChecks size={20} /> Done reading — quick quiz
+            Take the quiz
           </button>
         </div>
 
@@ -172,27 +175,27 @@ function Reader() {
               if (confirm(`Mark the remaining ${cov.unknownLemmas.length} new words as known?`))
                 cov.unknownLemmas.forEach((l) => actions.setKnown(l, true));
             }}
-            className="muted mt-6 text-sm underline"
+            className="muted mt-5 w-full text-center text-sm"
           >
             I know all the remaining words
           </button>
         )}
       </article>
 
-      <div className="fixed inset-x-0 bottom-20 z-20 mx-auto flex max-w-xl justify-center px-4">
-        <div className="card flex items-center gap-2 rounded-full p-1.5 shadow-lg">
+      <div className="fixed inset-x-0 bottom-24 z-20 mx-auto flex max-w-xl justify-center px-5">
+        <div className="flex items-center gap-1 rounded-full bg-ink p-1.5 text-on-ink shadow-xl">
           <button
             onClick={() => (playing ? stop() : playFrom(current ?? 0))}
-            className="bg-brand-500 flex items-center gap-2 rounded-full px-5 py-2.5 font-bold text-white"
+            className="flex items-center gap-2 rounded-full px-5 py-2.5 font-semibold"
           >
-            {playing ? <Pause size={18} /> : <Play size={18} />} {playing ? "Pause" : "Read aloud"}
+            {playing ? <Pause size={17} /> : <Play size={17} />} {playing ? "Pause" : "Read aloud"}
           </button>
           <button
             onClick={() => {
               const r = RATES[(RATES.indexOf(d.settings.ttsRate) + 1) % RATES.length] ?? 0.9;
               actions.updateSettings({ ttsRate: r });
             }}
-            className="px-3 text-sm font-bold"
+            className="rounded-full bg-on-ink/15 px-3.5 py-2.5 text-sm font-semibold tabular-nums"
           >
             {d.settings.ttsRate}×
           </button>

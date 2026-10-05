@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, BookmarkPlus, Check, RotateCcw, Shuffle, Volume2, X } from "lucide-react";
+import { BookmarkPlus, Check, RotateCcw, Shuffle, Volume2, X } from "lucide-react";
 import { romanize } from "@/lib/hangul";
+import PageHeader from "@/components/PageHeader";
 import { speak } from "@/lib/speech";
 import { shuffle } from "@/lib/text";
 import { findSet, type StudyItem } from "@/lib/study";
@@ -16,7 +17,7 @@ function Highlighted({ sentence, target }: { sentence: string; target?: string }
   return (
     <>
       {sentence.slice(0, i)}
-      <b className="text-brand-600 dark:text-brand-400">{target}</b>
+      <b className="rounded-md bg-accent-soft px-0.5">{target}</b>
       {sentence.slice(i + target.length)}
     </>
   );
@@ -84,7 +85,7 @@ function Flashcards() {
     return (
       <div className="p-6">
         <p>Set not found.</p>
-        <Link href="/study/" className="text-brand-600 font-semibold">
+        <Link href="/study/" className="font-semibold underline">
           Back to study
         </Link>
       </div>
@@ -93,29 +94,29 @@ function Flashcards() {
   const front = (it: StudyItem) =>
     koFirst ? (
       <>
-        <p className="ko text-5xl font-extrabold">{it.ko}</p>
-        <p className="muted mt-2">{romanize(it.ko)}</p>
+        <p className="ko display text-[3.4rem]">{it.ko}</p>
+        <p className="muted mt-2 text-lg">{romanize(it.ko)}</p>
       </>
     ) : (
-      <p className="text-3xl font-bold">{it.en}</p>
+      <p className="display text-[2.2rem]">{it.en}</p>
     );
 
   const back = (it: StudyItem) => (
     <>
       {koFirst ? (
-        <p className="text-2xl font-bold">{it.en}</p>
+        <p className="text-[1.7rem] leading-tight font-semibold tracking-tight">{it.en}</p>
       ) : (
         <>
-          <p className="ko text-4xl font-extrabold">{it.ko}</p>
+          <p className="ko display text-[2.8rem]">{it.ko}</p>
           <p className="muted mt-1">{romanize(it.ko)}</p>
         </>
       )}
       {it.sentence && (
-        <div className="mt-5 text-left">
+        <div className="tile mt-6 w-full p-4 text-left">
           <p className="ko text-lg">
             <Highlighted sentence={it.sentence} target={it.target} />
           </p>
-          {it.sentenceEn && <p className="muted text-sm">{it.sentenceEn}</p>}
+          {it.sentenceEn && <p className="sub text-sm">{it.sentenceEn}</p>}
         </div>
       )}
     </>
@@ -141,23 +142,20 @@ function Flashcards() {
   };
 
   return (
-    <div className="pt-safe flex min-h-[calc(100dvh-5rem)] flex-col px-4">
-      <header className="flex items-center gap-2 pt-4">
-        <Link href="/study/" aria-label="Back" className="p-1">
-          <ArrowLeft />
-        </Link>
-        <div className="min-w-0 flex-1">
-          <p className="ko truncate font-bold">{set.title}</p>
-          <p className="muted text-xs">
-            Flashcards · round {roundNo} · {Math.min(i + 1, round.length)}/{round.length}
-          </p>
-        </div>
+    <div className="pt-safe flex min-h-[calc(100dvh-5rem)] flex-col">
+      <PageHeader
+        back="/study/"
+        title={set.title}
+        subtitle={`Flashcards · round ${roundNo} · ${Math.min(i + 1, round.length)}/${round.length}`}
+      />
+      <div className="flex flex-1 flex-col px-5">
+      <div className="flex items-center gap-1">
         <button
           onClick={() => {
             setKoFirst((k) => !k);
             setFlipped(false);
           }}
-          className="card px-3 py-1.5 text-xs font-bold"
+          className="chip chip-on"
           aria-label="Switch which side shows first"
         >
           {koFirst ? "한 → EN" : "EN → 한"}
@@ -169,16 +167,20 @@ function Flashcards() {
             setRoundNo(1);
           }}
           aria-label="Toggle shuffle"
-          className={`card p-2 ${shuffled ? "text-brand-600 dark:text-brand-400" : "muted"}`}
+          aria-pressed={shuffled}
+          className="chip flex items-center gap-1.5"
         >
-          <Shuffle size={16} />
+          <Shuffle size={14} /> Shuffle
         </button>
-      </header>
+        <span className="label ml-auto tabular-nums">
+          {know.length} know · {learning.length} learning
+        </span>
+      </div>
 
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-line">
         <div className="flex h-full">
-          <div className="bg-emerald-500 transition-all" style={{ width: `${(know.length / Math.max(1, round.length)) * 100}%` }} />
-          <div className="bg-amber-500 transition-all" style={{ width: `${(learning.length / Math.max(1, round.length)) * 100}%` }} />
+          <div className="bg-ink transition-all" style={{ width: `${(know.length / Math.max(1, round.length)) * 100}%` }} />
+          <div className="bg-accent transition-all" style={{ width: `${(learning.length / Math.max(1, round.length)) * 100}%` }} />
         </div>
       </div>
 
@@ -214,22 +216,22 @@ function Flashcards() {
           >
             {/* Keyed per card so a new card never animates in from its answer side. */}
             <div key={`${roundNo}-${i}`} className={`flip-inner relative h-full min-h-80 ${flipped ? "flipped" : ""}`}>
-              <div className="flip-face card absolute inset-0 flex flex-col items-center justify-center p-6 text-center shadow-sm">
+              <div className="flip-face absolute inset-0 flex flex-col items-center justify-center rounded-[2rem] bg-sheet p-6 text-center shadow-[0_24px_60px_-28px_rgba(0,0,0,0.3)]">
                 {front(card)}
-                <p className="muted absolute bottom-4 text-xs">Tap to flip · swipe → know · ← still learning</p>
+                <p className="label absolute bottom-5">Tap to flip · swipe → know · ← still learning</p>
               </div>
-              <div className="flip-face flip-back card absolute inset-0 flex flex-col items-center justify-center overflow-y-auto p-6 text-center shadow-sm">
+              <div className="flip-face flip-back absolute inset-0 flex flex-col items-center justify-center overflow-y-auto rounded-[2rem] bg-sheet p-6 text-center shadow-[0_24px_60px_-28px_rgba(0,0,0,0.3)]">
                 {back(card)}
               </div>
             </div>
             {dx !== 0 && (
               <span
-                className={`absolute top-4 rounded-xl border-4 px-3 py-1 text-lg font-extrabold ${
-                  dx > 0 ? "left-4 -rotate-12 border-emerald-500 text-emerald-500" : "right-4 rotate-12 border-amber-500 text-amber-500"
+                className={`absolute top-6 rounded-full px-4 py-1.5 text-sm font-semibold ${
+                  dx > 0 ? "left-6 bg-ink text-on-ink" : "right-6 bg-accent text-white"
                 }`}
                 style={{ opacity: Math.min(1, Math.abs(dx) / 90) }}
               >
-                {dx > 0 ? "KNOW" : "LEARNING"}
+                {dx > 0 ? "Know it" : "Still learning"}
               </span>
             )}
             <button
@@ -237,43 +239,48 @@ function Flashcards() {
               onPointerUp={(e) => e.stopPropagation()}
               onClick={() => speak(card.ko, { rate: d.settings.ttsRate })}
               aria-label="Play audio"
-              className="bg-brand-500 absolute top-4 right-4 z-10 rounded-full p-2.5 text-white"
+              className="absolute top-5 right-5 z-10 flex size-11 items-center justify-center rounded-full bg-ink text-on-ink"
             >
-              <Volume2 size={18} />
+              <Volume2 size={18} strokeWidth={1.75} />
             </button>
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-3 pb-4">
             <button
               onClick={() => answer(false)}
-              className="flex items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 py-3.5 font-bold text-amber-600"
+              className="btn btn-line h-14"
             >
-              <X size={20} /> Still learning
+              <X size={18} strokeWidth={1.75} className="text-accent" /> Still learning
             </button>
             <button
               onClick={() => answer(true)}
-              className="flex items-center justify-center gap-2 rounded-2xl border-2 border-emerald-500 py-3.5 font-bold text-emerald-600"
+              className="btn btn-ink h-14"
             >
-              <Check size={20} /> Know it
+              <Check size={18} strokeWidth={1.75} /> Know it
             </button>
           </div>
         </>
       ) : (
-        <div className="animate-pop mt-10 text-center">
-          <p className="text-5xl">{learning.length === 0 ? "🎉" : "📚"}</p>
-          <h2 className="mt-2 text-2xl font-extrabold">
+        <div className="animate-pop mt-8">
+          <h2 className="display text-[2.2rem]">
             {learning.length === 0 ? "You know them all!" : `Round ${roundNo} done`}
           </h2>
-          <p className="muted mt-1">
-            <b className="text-emerald-600">{know.length} know</b> ·{" "}
-            <b className="text-amber-600">{learning.length} still learning</b>
-          </p>
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="tile p-4">
+              <p className="font-medium">Know</p>
+              <p className="num-thin mt-4 text-[2.4rem] leading-none">{know.length}</p>
+            </div>
+            <div className="tile p-4">
+              <p className="font-medium">Still learning</p>
+              <p className="num-thin mt-4 text-[2.4rem] leading-none text-accent">{learning.length}</p>
+            </div>
+          </div>
 
           {learning.length > 0 && (
-            <ul className="card mt-4 divide-y divide-[var(--line)] text-left">
+            <ul className="card mt-4 divide-y divide-line text-left">
               {learning.slice(0, 20).map((it) => (
-                <li key={it.ko} className="flex justify-between gap-3 px-4 py-2 text-sm">
-                  <b className="ko">{it.ko}</b>
+                <li key={it.ko} className="flex justify-between gap-3 px-4 py-2.5 text-[15px]">
+                  <b className="ko font-semibold">{it.ko}</b>
                   <span className="muted truncate">{it.en}</span>
                 </li>
               ))}
@@ -287,18 +294,18 @@ function Flashcards() {
                   setRoundNo((r) => r + 1);
                   startRound(learning);
                 }}
-                className="bg-brand-500 rounded-2xl py-3.5 font-bold text-white shadow-[0_4px_0_var(--color-brand-700)] active:translate-y-1 active:shadow-none"
+                className="btn btn-ink h-14"
               >
                 Study the {learning.length} I&apos;m still learning
               </button>
             )}
             {learning.some((it) => it.sentence) &&
               (addedCount === null ? (
-                <button onClick={addToReview} className="flex items-center justify-center gap-2 rounded-2xl bg-amber-500 py-3 font-bold text-white">
+                <button onClick={addToReview} className="btn btn-accent h-12">
                   <BookmarkPlus size={18} /> Add them to my review deck
                 </button>
               ) : (
-                <p className="text-sm font-semibold text-emerald-600">
+                <p className="text-good text-center text-sm font-semibold">
                   {addedCount > 0 ? `Added ${addedCount} to your review deck ✓` : "They're already in your review deck ✓"}
                 </p>
               ))}
@@ -307,16 +314,17 @@ function Flashcards() {
                 setRoundNo(1);
                 startRound(set.items);
               }}
-              className="hairline flex items-center justify-center gap-2 rounded-2xl border-2 py-3 font-bold"
+              className="btn btn-line h-12"
             >
               <RotateCcw size={18} /> Restart all {set.items.length}
             </button>
-            <Link href={`/study/type/?set=${encodeURIComponent(set.id)}`} className="muted py-2 text-sm font-semibold underline">
+            <Link href={`/study/type/?set=${encodeURIComponent(set.id)}`} className="muted py-2 text-center text-sm">
               Play Type It! with this set
             </Link>
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

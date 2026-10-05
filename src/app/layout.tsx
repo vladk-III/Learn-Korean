@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
 
 const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
   title: "한글 Daily — Learn Korean",
@@ -17,14 +20,14 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f7fb" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b0d14" },
+    { media: "(prefers-color-scheme: light)", color: "#efeeeb" },
+    { media: "(prefers-color-scheme: dark)", color: "#101010" },
   ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable}>
       <body className="font-sans antialiased">
         {base ? (
           // GitHub Pages serves /learn-korean/ and /Learn-Korean/ alike, but the app's

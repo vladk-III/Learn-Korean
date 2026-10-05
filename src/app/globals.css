@@ -1,33 +1,62 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
+  --font-sans: var(--font-inter), "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans CJK KR", "Malgun Gothic", system-ui, sans-serif;
 }
 
+/* Design tokens — warm neutral canvas, white sheets, charcoal actions, one orange accent. */
 :root {
-  --bg: #f6f7fb;
+  --bg: #efeeeb;
+  --sheet: #ffffff;
   --card: #ffffff;
-  --fg: #111827;
-  --muted: #6b7280;
-  --line: #e5e7eb;
+  --tile: #f3f2f0;
+  --fg: #1d1d1c;
+  --fg-2: #5f5d59;
+  --muted: #a3a19c;
+  --line: #e9e8e5;
+  --ink: #2a2a29;
+  --on-ink: #ffffff;
+  --accent: #f0732a;
+  --accent-soft: #fdebdf;
+  --good: #3f8f5a;
+  --bad: #d4553a;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0b0d14;
-    --card: #151925;
-    --fg: #f3f4f6;
-    --muted: #9ca3af;
-    --line: #262b3a;
+    --bg: #101010;
+    --sheet: #171717;
+    --card: #1b1b1b;
+    --tile: #232322;
+    --fg: #f1f0ed;
+    --fg-2: #b9b7b2;
+    --muted: #7b7975;
+    --line: #2a2a29;
+    --ink: #f1f0ed;
+    --on-ink: #171717;
+    --accent: #f5864a;
+    --accent-soft: rgba(245, 134, 74, 0.16);
+    --good: #6cbf86;
+    --bad: #ee7a62;
     color-scheme: dark;
   }
+}
+
+@theme inline {
+  --color-canvas: var(--bg);
+  --color-sheet: var(--sheet);
+  --color-tile: var(--tile);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-on-ink: var(--on-ink);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-good: var(--good);
+  --color-bad: var(--bad);
 }
 
 html,
@@ -38,14 +67,137 @@ body {
   overscroll-behavior-y: none;
 }
 
+body {
+  font-feature-settings: "ss01", "cv11";
+}
+
+/* White card with a hairline border (list rows, panels). */
 .card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 1.25rem;
+  border-radius: 1.5rem;
+}
+
+/* Soft gray tile with no border (stat tiles, inner panels). */
+.tile {
+  background: var(--tile);
+  border-radius: 1.4rem;
+}
+
+/* The white sheet that slides over the gray header area. */
+.sheet {
+  background: var(--sheet);
+  border-radius: 2rem 2rem 0 0;
+}
+
+/* Gray circle holding a line icon. */
+.icon-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  background: var(--tile);
+  color: var(--fg);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition:
+    transform 0.12s,
+    opacity 0.12s,
+    background 0.15s;
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn:disabled {
+  opacity: 0.35;
+}
+.btn-ink {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-soft {
+  background: var(--tile);
+  color: var(--fg);
+}
+.btn-line {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--fg);
+}
+
+/* Segmented chips: gray text, dark pill when selected (like the W/M/8M row). */
+.chip {
+  border-radius: 9999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.chip[aria-pressed="true"],
+.chip-on {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+/* Small orange status pill ("Pre heating"). */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 9999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: #fff;
+}
+.pill-soft {
+  background: var(--tile);
+  color: var(--fg-2);
+}
+.pill-outline {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--fg-2);
+}
+
+.display {
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+.num-thin {
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
 }
 
 .muted {
   color: var(--muted);
+}
+.sub {
+  color: var(--fg-2);
 }
 
 .hairline {
@@ -70,6 +222,7 @@ body {
 .ko {
   word-break: keep-all;
   line-height: 1.9;
+  letter-spacing: -0.01em;
 }
 
 @keyframes sheet-up {
@@ -102,7 +255,7 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--color-brand-500);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -140,4 +293,19 @@ textarea:focus-visible {
 }
 .animate-shake {
   animation: shake 0.4s;
+}
+
+input[type="range"],
+input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+input,
+textarea,
+select {
+  color: var(--fg);
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
 }

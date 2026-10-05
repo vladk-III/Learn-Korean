@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { Check } from "lucide-react";
 import { actions } from "@/lib/store";
 
 const LEVELS = [
   { v: 0, label: "Brand new", desc: "I can read Hangul but know few words" },
-  { v: 1, label: "Beginner (A1)", desc: "Greetings, basic nouns and verbs" },
-  { v: 2, label: "Elementary (A2)", desc: "Simple daily conversations" },
-  { v: 3, label: "Intermediate (B1)", desc: "Can follow easy news" },
+  { v: 1, label: "Beginner", tag: "A1", desc: "Greetings, basic nouns and verbs" },
+  { v: 2, label: "Elementary", tag: "A2", desc: "Simple daily conversations" },
+  { v: 3, label: "Intermediate", tag: "B1", desc: "Can follow easy news" },
 ];
 
 export default function Onboarding() {
@@ -15,51 +16,62 @@ export default function Onboarding() {
   const [perDay, setPerDay] = useState(20);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
-      <div className="card animate-sheet pb-safe max-h-[92dvh] w-full max-w-xl overflow-y-auto rounded-b-none p-6 sm:rounded-b-2xl">
-        <p className="text-4xl">🇰🇷</p>
-        <h1 className="mt-2 text-2xl font-extrabold">환영합니다! Welcome</h1>
-        <p className="muted mt-1 text-sm">
-          Learn Korean from real-style news and short clips. Tap any word for its meaning, save the sentence, then
-          practise it with spaced repetition — reading, writing, listening and speaking.
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center">
+      <div className="sheet animate-sheet pb-safe max-h-[94dvh] w-full max-w-xl overflow-y-auto px-6 pt-7 pb-6 sm:rounded-b-[2rem]">
+        <h1 className="display text-[2.6rem]">
+          환영합니다
+          <span className="muted block">Welcome</span>
+        </h1>
+        <p className="sub mt-3 text-[15px] leading-relaxed">
+          Learn Korean from news and short clips. Tap any word for its meaning, save the sentence, then practise it
+          with spaced repetition.
         </p>
 
-        <h2 className="mt-5 text-sm font-bold tracking-wide uppercase">Your level</h2>
+        <p className="label mt-7">Your level</p>
         <div className="mt-2 grid gap-2">
           {LEVELS.map((l) => (
             <button
               key={l.v}
               onClick={() => setLevel(l.v)}
-              className={`rounded-xl border-2 p-3 text-left ${
-                level === l.v ? "border-brand-500 bg-brand-50 dark:bg-brand-500/10" : "hairline"
+              className={`flex items-center gap-3 rounded-2xl p-4 text-left transition-colors ${
+                level === l.v ? "bg-ink text-on-ink" : "tile"
               }`}
             >
-              <div className="font-semibold">{l.label}</div>
-              <div className="muted text-xs">{l.desc}</div>
+              <div className="flex-1">
+                <div className="font-semibold">
+                  {l.label} {l.tag && <span className="opacity-50">· {l.tag}</span>}
+                </div>
+                <div className={`text-sm ${level === l.v ? "opacity-60" : "muted"}`}>{l.desc}</div>
+              </div>
+              {level === l.v && <Check size={18} />}
             </button>
           ))}
         </div>
 
-        <h2 className="mt-5 text-sm font-bold tracking-wide uppercase">New cards per day: {perDay}</h2>
+        <div className="mt-7 flex items-baseline justify-between">
+          <p className="label">New cards per day</p>
+          <p className="num-thin text-3xl">{perDay}</p>
+        </div>
         <input
           type="range"
           min={15}
           max={25}
           value={perDay}
           onChange={(e) => setPerDay(Number(e.target.value))}
-          className="mt-2 w-full accent-indigo-500"
+          className="mt-2 w-full"
         />
-        <p className="muted text-xs">15–25 keeps reviews sustainable (≈15–25 minutes a day).</p>
+        <p className="muted text-xs">15–25 keeps reviews to roughly 15–25 minutes a day.</p>
 
-        <div className="mt-5 rounded-xl bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">
-          <b>House rule:</b> clear your due reviews before mining new sentences. It keeps review debt from piling up.
+        <div className="tile mt-6 flex gap-3 p-4 text-sm">
+          <span className="pill shrink-0 self-start">Rule</span>
+          <p className="sub">Clear your due reviews before saving new sentences, so review debt never piles up.</p>
         </div>
 
         <button
           onClick={() => actions.updateSettings({ onboarded: true, placement: level, newPerDay: perDay })}
-          className="bg-brand-500 mt-6 w-full rounded-2xl py-4 text-lg font-bold text-white shadow-[0_4px_0_var(--color-brand-700)] active:translate-y-1 active:shadow-none"
+          className="btn btn-ink mt-6 h-14 w-full text-base"
         >
-          시작하기 · Start
+          Start learning
         </button>
       </div>
     </div>

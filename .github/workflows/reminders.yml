@@ -1,0 +1,39 @@
+name: Streak reminders
+
+# Hourly; the script only sends at the local hours chosen in the app.
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+    inputs:
+      test:
+        description: "Send a test notification now"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: streak-reminders
+  cancel-in-progress: false
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Send reminder
+        env:
+          REMINDER_CONFIG: ${{ secrets.REMINDER_CONFIG }}
+          TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.test }}
+        run: |
+          mkdir -p /tmp/push && cp scripts/send-reminder.mjs /tmp/push/
+          cd /tmp/push && npm init -y >/dev/null && npm install --silent --no-audit --no-fund web-push@3.6.7
+          node send-reminder.mjs

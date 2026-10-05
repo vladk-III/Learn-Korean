@@ -1,36 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, Clapperboard, Flame, Keyboard, Layers, Lock } from "lucide-react";
+import { AlarmClock, BookOpen, ChevronRight, Clapperboard, Flame, Layers, Lock, Plus, SquareStack } from "lucide-react";
 import { ARTICLES } from "@/content/articles";
 import { CLIPS } from "@/content/clips";
 import CoverageBadge from "@/components/CoverageBadge";
-import { blockingDue, coverage, dueCards, newQueue, streak, today, useData, useHydrated } from "@/lib/store";
+import Arc from "@/components/Arc";
+import { activeToday, blockingDue, coverage, dueCards, newQueue, streak, today, useData, useHydrated } from "@/lib/store";
 
-function Ring({ value, label }: { value: number; label: string }) {
-  const r = 34;
-  const c = 2 * Math.PI * r;
+function greeting(): [string, string] {
+  const h = new Date().getHours();
+  if (h < 5) return ["Late", "night"];
+  if (h < 12) return ["Good", "morning"];
+  if (h < 18) return ["Good", "afternoon"];
+  return ["Good", "evening"];
+}
+
+function Row({
+  href,
+  icon: Icon,
+  title,
+  status,
+  extra,
+}: {
+  href: string;
+  icon: typeof Layers;
+  title: string;
+  status: string;
+  extra?: React.ReactNode;
+}) {
   return (
-    <div className="relative size-24">
-      <svg viewBox="0 0 80 80" className="size-24 -rotate-90">
-        <circle cx="40" cy="40" r={r} fill="none" strokeWidth="8" className="stroke-gray-200 dark:stroke-white/10" />
-        <circle
-          cx="40"
-          cy="40"
-          r={r}
-          fill="none"
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - Math.min(1, value))}
-          className="stroke-brand-500 transition-all"
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-xl font-extrabold">{label}</span>
-        <span className="muted text-[10px] font-semibold uppercase">minutes</span>
-      </div>
-    </div>
+    <li>
+      <Link href={href} className="card flex items-center gap-4 px-4 py-4">
+        <span className="icon-circle size-12">
+          <Icon size={20} strokeWidth={1.75} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="ko truncate leading-snug font-semibold">{title}</p>
+          <p className="muted truncate text-[15px]">{status}</p>
+          {extra && <div className="mt-1.5">{extra}</div>}
+        </div>
+        <ChevronRight size={18} className="muted shrink-0" />
+      </Link>
+    </li>
   );
 }
 
@@ -44,115 +56,121 @@ export default function Today() {
   const fresh = newQueue(d).length;
   const blocked = blockingDue(d);
   const minutes = Math.floor(t.seconds / 60);
+  const goal = d.settings.dailyGoalMin;
   const s = streak(d);
+  const doneToday = activeToday(d);
   const reviewsDone = due + fresh === 0;
+  const evening = new Date().getHours() >= 18;
+  const [g1, g2] = greeting();
 
-  // Recommend the unread-ish article closest to the 95–98% sweet spot.
-  const ranked = ARTICLES.map((a) => ({ a, cov: coverage(d, a) }))
-    .map((x) => ({ ...x, score: Math.abs(x.cov.pct - 0.965) }))
-    .sort((x, y) => x.score - y.score);
-  const pick = ranked[0];
+  // Recommend the article closest to the 95–98% comprehension sweet spot.
+  const pick = ARTICLES.map((a) => ({ a, cov: coverage(d, a) })).sort(
+    (x, y) => Math.abs(x.cov.pct - 0.965) - Math.abs(y.cov.pct - 0.965),
+  )[0];
   const clip = CLIPS[new Date().getDate() % CLIPS.length];
 
+  const status = doneToday ? "Streak safe" : evening && s > 0 ? "Streak at risk" : "In progress";
+
   return (
-    <div className="pt-safe px-4">
-      <header className="flex items-center justify-between pt-5">
-        <div>
-          <p className="muted text-sm font-semibold">오늘도 화이팅!</p>
-          <h1 className="text-2xl font-extrabold">Today</h1>
-        </div>
-        <div className="flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1.5 font-extrabold text-orange-600 dark:bg-orange-500/15">
-          <Flame size={18} fill="currentColor" /> {s}
+    <div className="pt-safe">
+      <header className="flex items-start justify-between px-5 pt-6 pb-7">
+        <h1 className="display text-[2.6rem]">
+          {g1}
+          <span className="muted block">{g2}</span>
+        </h1>
+        <div className="mt-1 flex items-center gap-2.5">
+          <Link href="/me/#reminders" aria-label="Streak reminders" className="flex size-12 items-center justify-center rounded-full bg-sheet">
+            <AlarmClock size={21} strokeWidth={1.75} />
+          </Link>
+          <Link
+            href="/me/"
+            aria-label={`${s} day streak`}
+            className="relative flex size-12 items-center justify-center rounded-full bg-ink text-on-ink"
+          >
+            <Flame size={20} strokeWidth={1.75} />
+            {s > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-5 rounded-full border-2 border-canvas bg-accent px-1 text-center text-[10px] leading-4 font-semibold text-white">
+                {s}
+              </span>
+            )}
+          </Link>
         </div>
       </header>
 
-      <section className="card mt-4 flex items-center gap-4 p-4">
-        <Ring value={minutes / d.settings.dailyGoalMin} label={`${minutes}/${d.settings.dailyGoalMin}`} />
-        <div className="text-sm">
-          <p className="font-bold">Daily goal</p>
-          <p className="muted">
-            Short, daily sessions win. {t.reviews} reviews · {t.mined} sentences mined today.
-          </p>
+      <div className="sheet min-h-[70dvh] px-5 pt-7">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">Today&apos;s session</h2>
+            <span className={`pill mt-2 ${doneToday ? "pill-soft" : ""}`}>{status}</span>
+          </div>
+          <Link href="/news/" aria-label="Find something to read" className="icon-circle size-12">
+            <Plus size={22} strokeWidth={1.75} />
+          </Link>
         </div>
-      </section>
 
-      <h2 className="mt-6 mb-2 text-sm font-bold tracking-wide uppercase">Your plan</h2>
-      <ol className="space-y-3">
-        <li>
-          <Link href="/review/" className="card flex items-center gap-4 p-4">
-            <span className={`rounded-2xl p-3 text-white ${reviewsDone ? "bg-emerald-500" : "bg-rose-500"}`}>
-              <Layers />
-            </span>
-            <div className="flex-1">
-              <p className="font-bold">1. Clear reviews</p>
-              <p className="muted text-sm">
-                {reviewsDone ? "All done — nice! 🎉" : `${due} due · ${fresh} new waiting`}
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          <div className="tile flex min-h-40 flex-col justify-between p-4">
+            <div className="flex items-start justify-between gap-2">
+              <p className="leading-tight font-medium">
+                Minutes
+                <br />
+                today
               </p>
+              <Arc value={minutes / goal} />
             </div>
-            {!reviewsDone && <span className="bg-brand-500 rounded-full px-3 py-1 text-sm font-bold text-white">Start</span>}
-          </Link>
-        </li>
-        <li>
-          <Link href={`/reader/?id=${pick.a.id}`} className="card flex items-center gap-4 p-4">
-            <span className="rounded-2xl bg-sky-500 p-3 text-white">
-              {blocked > 0 ? <Lock /> : <BookOpen />}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="font-bold">2. Read: {pick.a.title}</p>
-              <p className="muted truncate text-sm">{pick.a.titleEn}</p>
-              <div className="mt-1">
-                <CoverageBadge pct={pick.cov.pct} />
-              </div>
-            </div>
-          </Link>
-        </li>
-        <li>
-          <Link href={`/clips/?id=${clip.id}`} className="card flex items-center gap-4 p-4">
-            <span className="rounded-2xl bg-fuchsia-500 p-3 text-white">
-              <Clapperboard />
-            </span>
-            <div className="flex-1">
-              <p className="font-bold">3. Watch &amp; shadow a clip</p>
-              <p className="muted text-sm">
-                {clip.emoji} {clip.title} · {clip.titleEn}
+            <p className="num-thin text-[2.6rem] leading-none">
+              {minutes}
+              <span className="muted text-2xl">/{goal}</span>
+            </p>
+          </div>
+          <Link href="/review/" className="tile flex min-h-40 flex-col justify-between p-4">
+            <div className="flex items-start justify-between gap-2">
+              <p className="leading-tight font-medium">
+                Cards
+                <br />
+                waiting
               </p>
+              <Arc value={reviewsDone ? 1 : t.reviews / Math.max(1, t.reviews + due + fresh)} />
             </div>
+            <p className="num-thin text-[2.6rem] leading-none">{due + fresh}</p>
           </Link>
-        </li>
-        <li>
-          <Link href="/study/" className="card flex items-center gap-4 p-4">
-            <span className="rounded-2xl bg-amber-500 p-3 text-white">
-              <Keyboard />
-            </span>
-            <div className="flex-1">
-              <p className="font-bold">Bonus: flashcards &amp; Type It!</p>
-              <p className="muted text-sm">Flip cards or race the clock typing words</p>
-            </div>
+        </div>
+
+        {!doneToday && evening && s > 0 && (
+          <Link href="/review/" className="mt-3 flex items-center gap-3 rounded-[1.4rem] bg-accent-soft p-4">
+            <Flame size={20} className="text-accent" />
+            <p className="flex-1 text-sm">
+              <b>Your {s}-day streak ends at midnight.</b> A few minutes of reviews will keep it.
+            </p>
+            <ChevronRight size={18} className="text-accent" />
           </Link>
-        </li>
-      </ol>
+        )}
 
-      {blocked > 0 && (
-        <p className="mt-4 rounded-xl bg-rose-50 p-3 text-sm text-rose-800 dark:bg-rose-500/10 dark:text-rose-200">
-          Mining is locked until you clear {blocked} overdue review{blocked > 1 ? "s" : ""}. Reading and listening
-          are always open.
-        </p>
-      )}
+        <div className="mt-9 flex items-baseline justify-between">
+          <h2 className="text-2xl font-semibold tracking-tight">Your plan</h2>
+          <Link href="/study/" className="muted text-[15px]">
+            Practice
+          </Link>
+        </div>
 
-      <section className="mt-6 grid grid-cols-3 gap-3 text-center">
-        <div className="card p-3">
-          <p className="text-2xl font-extrabold">{d.cards.length}</p>
-          <p className="muted text-xs">cards</p>
-        </div>
-        <div className="card p-3">
-          <p className="text-2xl font-extrabold">{d.known.length}</p>
-          <p className="muted text-xs">marked known</p>
-        </div>
-        <div className="card p-3">
-          <p className="text-2xl font-extrabold">{Math.round(d.settings.retention * 100)}%</p>
-          <p className="muted text-xs">target recall</p>
-        </div>
-      </section>
+        <ul className="mt-4 space-y-3 pb-6">
+          <Row
+            href="/review/"
+            icon={Layers}
+            title="Clear reviews"
+            status={reviewsDone ? "All clear" : `${due} due · ${fresh} new`}
+          />
+          <Row
+            href={`/reader/?id=${pick.a.id}`}
+            icon={blocked > 0 ? Lock : BookOpen}
+            title={pick.a.title}
+            status={blocked > 0 ? "Reading only — clear reviews to save words" : pick.a.titleEn}
+            extra={<CoverageBadge pct={pick.cov.pct} />}
+          />
+          <Row href={`/clips/?id=${clip.id}`} icon={Clapperboard} title={clip.title} status={`Clip · ${clip.titleEn}`} />
+          <Row href="/study/" icon={SquareStack} title="Flashcards & Type It!" status="Practice games" />
+        </ul>
+      </div>
     </div>
   );
 }

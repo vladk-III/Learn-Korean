@@ -41,6 +41,21 @@ npm run dev          # listens on 0.0.0.0:3000
 Open `http://<your-computer-ip>:3000` on your phone (same Wi-Fi). Speech
 recognition needs HTTPS, so use options A/B to test speaking on the phone.
 
+### Streak reminders (optional, ~2 minutes)
+Evening notifications that only arrive on days you haven't studied yet ("Your 12-day streak ends at midnight").
+There's no server: an hourly GitHub Actions job (`.github/workflows/reminders.yml`) sends a Web Push at the local
+times you pick, and the app's service worker stays silent if you've already studied.
+
+1. In the installed app open **Me → Streak reminders**, choose times, tap **Turn on reminders** and allow notifications.
+2. Tap **Copy setup code**, then add it as a repository secret named `REMINDER_CONFIG`
+   (**Settings → Secrets and variables → Actions → New repository secret**).
+3. Optional: **Actions → Streak reminders → Run workflow** (with *test* ticked) sends one immediately.
+
+The setup code contains a key pair generated on your phone plus your push subscription and time zone — keep it in the
+secret, not in the repo. If you change times (or travel to another time zone), copy the updated code into the secret.
+GitHub pauses scheduled workflows after 60 days without repository activity; re-enable it from the Actions tab if so.
+On iPhone, notifications need iOS 16.4+ and the app added to the Home Screen.
+
 ### Voice tips
 - Audio uses your phone's built-in Korean text-to-speech voice. If audio is silent
   or not Korean: **iOS** Settings → Accessibility → Spoken Content → Voices → Korean;

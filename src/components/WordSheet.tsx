@@ -93,28 +93,28 @@ export default function WordSheet({ token: tapped, sentence, source, onClose }: 
         role="dialog"
         aria-label={`Meaning of ${target.core}`}
         onClick={(e) => e.stopPropagation()}
-        className="card animate-sheet pb-safe relative max-h-[85dvh] w-full max-w-xl overflow-y-auto rounded-b-none p-5 shadow-2xl"
+        className="sheet animate-sheet pb-safe relative max-h-[86dvh] w-full max-w-xl overflow-y-auto px-6 pt-4 pb-6 shadow-2xl"
       >
-        <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-gray-300 dark:bg-gray-600" />
-        <button onClick={onClose} aria-label="Close" className="muted absolute top-4 right-4 p-1">
-          <X size={20} />
+        <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-line" />
+        <button onClick={onClose} aria-label="Close" className="icon-circle absolute top-5 right-5 size-10">
+          <X size={18} strokeWidth={1.75} />
         </button>
 
-        <div className="flex items-start gap-3">
+        <div className="flex items-center gap-4 pr-12">
           <button
             onClick={() => speak(target.core, { rate: d.settings.ttsRate })}
             aria-label="Play word"
-            className="bg-brand-500 mt-1 rounded-full p-2.5 text-white"
+            className="flex size-14 shrink-0 items-center justify-center rounded-full bg-ink text-on-ink"
           >
-            <Volume2 size={20} />
+            <Volume2 size={22} strokeWidth={1.75} />
           </button>
           <div className="min-w-0 flex-1">
-            <div className="text-3xl font-extrabold">{target.core}</div>
-            <div className="muted text-sm">
+            <div className="ko display text-[2.2rem]">{target.core}</div>
+            <div className="muted text-[15px]">
               {romanize(target.core)}
               {lemma !== target.core && (
                 <>
-                  {" · "}dictionary form <b className="text-[var(--fg)]">{lemma}</b>
+                  {" · "}dictionary form <b className="text-fg">{lemma}</b>
                 </>
               )}
             </div>
@@ -124,26 +124,12 @@ export default function WordSheet({ token: tapped, sentence, source, onClose }: 
         <div className="mt-4">
           {entry ? (
             <>
-              <div className="flex flex-wrap items-center gap-2 text-xs">
-                <span className="rounded-full bg-gray-100 px-2 py-0.5 font-semibold dark:bg-white/10">
-                  {POS_LABEL[entry.pos]}
-                </span>
-                <span className="rounded-full bg-gray-100 px-2 py-0.5 font-semibold dark:bg-white/10">
-                  {LEVEL[entry.level]}
-                </span>
-                <span
-                  className={`rounded-full px-2 py-0.5 font-semibold ${
-                    status === "known"
-                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300"
-                      : status === "learning"
-                        ? "bg-sky-100 text-sky-800 dark:bg-sky-500/15 dark:text-sky-300"
-                        : "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300"
-                  }`}
-                >
-                  {status}
-                </span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="pill pill-soft">{POS_LABEL[entry.pos]}</span>
+                <span className="pill pill-soft">{LEVEL[entry.level]}</span>
+                <span className={status === "new" ? "pill" : "pill pill-outline"}>{status}</span>
               </div>
-              <p className="mt-2 text-lg font-semibold">{entry.en}</p>
+              <p className="mt-3 text-xl font-semibold tracking-tight">{entry.en}</p>
             </>
           ) : g.kind === "number" ? (
             <p className="text-lg font-semibold">Number{g.entry ? ` + ${g.entry.ko}` : ""}</p>
@@ -161,16 +147,16 @@ export default function WordSheet({ token: tapped, sentence, source, onClose }: 
                 value={customGloss}
                 onChange={(e) => setCustomGloss(e.target.value)}
                 placeholder={onlineGloss ? "Edit meaning (optional)" : "Type a meaning to save this word"}
-                className="hairline w-full rounded-xl border bg-transparent px-3 py-2 text-sm"
+                className="tile w-full px-4 py-3 text-sm outline-none"
               />
-              <a href={naverUrl(target.core)} target="_blank" rel="noreferrer" className="text-brand-600 dark:text-brand-400 inline-flex items-center gap-1 text-sm font-semibold">
+              <a href={naverUrl(target.core)} target="_blank" rel="noreferrer" className="sub inline-flex items-center gap-1 text-sm font-semibold underline">
                 Naver dictionary <ExternalLink size={14} />
               </a>
             </div>
           )}
 
           {g.notes.length > 0 && (
-            <ul className="mt-2 space-y-0.5 text-sm">
+            <ul className="mt-2 space-y-0.5 text-[15px]">
               {g.notes.map((n) => (
                 <li key={n} className="muted">
                   • {n}
@@ -180,7 +166,7 @@ export default function WordSheet({ token: tapped, sentence, source, onClose }: 
           )}
         </div>
 
-        <div className="mt-4 rounded-xl bg-gray-50 p-3 dark:bg-white/5">
+        <div className="tile mt-5 p-4">
           <div className="flex items-start gap-2">
             <button
               onClick={() => speak(sentence.ko, { rate: d.settings.ttsRate })}
@@ -194,18 +180,18 @@ export default function WordSheet({ token: tapped, sentence, source, onClose }: 
                 {sentence.ko.split(target.core).map((part, i, arr) => (
                   <span key={i}>
                     {part}
-                    {i < arr.length - 1 && <mark className="bg-brand-100 dark:bg-brand-500/30 rounded px-0.5 text-inherit">{target.core}</mark>}
+                    {i < arr.length - 1 && <mark className="rounded-md bg-accent-soft px-0.5 text-inherit">{target.core}</mark>}
                   </span>
                 ))}
               </p>
               {sentence.en ? (
-                <p className="muted text-sm">{sentence.en}</p>
+                <p className="sub text-[15px] leading-snug">{sentence.en}</p>
               ) : (
                 <input
                   value={customTranslation}
                   onChange={(e) => setCustomTranslation(e.target.value)}
                   placeholder="Sentence translation (optional)"
-                  className="hairline mt-1 w-full rounded-lg border bg-transparent px-2 py-1 text-sm"
+                  className="mt-2 w-full rounded-xl bg-sheet px-3 py-2 text-sm outline-none"
                 />
               )}
             </div>
@@ -213,22 +199,22 @@ export default function WordSheet({ token: tapped, sentence, source, onClose }: 
         </div>
 
         {!mined && otherUnknown.length > 0 && (
-          <div className="mt-3 rounded-xl border border-amber-300 p-3 text-sm dark:border-amber-500/40">
+          <div className="card mt-3 p-4 text-[15px]">
             <p>
-              <b>1T rule:</b> this sentence has {otherUnknown.length} other new word
+              <span className="pill mr-1.5">1T rule</span>This sentence has {otherUnknown.length} other new word
               {otherUnknown.length > 1 ? "s" : ""}. Keep one target per card — tap to switch target, or mark ones you
               already know.
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               {otherUnknown.map((t) => (
-                <span key={t.gloss.lemma} className="inline-flex overflow-hidden rounded-full border border-amber-400/60">
-                  <button onClick={() => setTarget(t)} className="px-2.5 py-1 font-semibold">
+                <span key={t.gloss.lemma} className="inline-flex overflow-hidden rounded-full bg-tile">
+                  <button onClick={() => setTarget(t)} className="ko px-3 py-1.5 font-semibold">
                     {t.core}
                   </button>
                   <button
                     onClick={() => actions.setKnown(t.gloss.lemma, true)}
                     aria-label={`Mark ${t.core} as known`}
-                    className="border-l border-amber-400/60 px-2 py-1 text-emerald-600"
+                    className="border-l border-line px-2.5 py-1.5 text-good"
                   >
                     <Check size={14} />
                   </button>
@@ -238,32 +224,30 @@ export default function WordSheet({ token: tapped, sentence, source, onClose }: 
           </div>
         )}
 
-        <div className="sticky -bottom-5 -mx-5 mt-4 grid grid-cols-[1fr_auto] gap-2 bg-[var(--card)] px-5 pt-2 pb-5">
+        <div className="sticky -bottom-6 -mx-6 mt-5 grid grid-cols-[1fr_auto] gap-2 bg-sheet px-6 pt-2 pb-6">
           {mined ? (
-            <div className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 py-3.5 font-bold text-white">
-              <BookmarkCheck size={20} /> In your review deck
+            <div className="btn btn-soft h-14">
+              <BookmarkCheck size={19} strokeWidth={1.75} /> In your review deck
             </div>
           ) : blocked > 0 ? (
             <Link
               href="/review/"
-              className="flex items-center justify-center gap-2 rounded-2xl bg-rose-500 py-3.5 text-center font-bold text-white"
+              className="btn btn-accent h-14 px-4 text-center"
             >
-              <Lock size={18} /> Clear {blocked} due review{blocked > 1 ? "s" : ""} first
+              <Lock size={17} /> Clear {blocked} due review{blocked > 1 ? "s" : ""} first
             </Link>
           ) : (
             <button
               onClick={mine}
               disabled={!glossText}
-              className="bg-brand-500 flex items-center justify-center gap-2 rounded-2xl py-3.5 font-bold text-white shadow-[0_4px_0_var(--color-brand-700)] active:translate-y-1 active:shadow-none disabled:opacity-40"
+              className="btn btn-ink h-14"
             >
-              <BookmarkPlus size={20} /> Mine sentence
+              <BookmarkPlus size={19} strokeWidth={1.75} /> Save sentence
             </button>
           )}
           <button
             onClick={() => actions.setKnown(lemma, status !== "known")}
-            className={`rounded-2xl border-2 px-4 text-sm font-bold ${
-              status === "known" ? "border-emerald-500 text-emerald-600" : "hairline"
-            }`}
+            className={`btn h-14 px-5 text-sm ${status === "known" ? "btn-soft" : "btn-line"}`}
           >
             {status === "known" ? "Known ✓" : "I know it"}
           </button>
