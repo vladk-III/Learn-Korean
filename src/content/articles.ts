@@ -1,5 +1,6 @@
 import type { Article } from "./types";
 import { DLPT_ARTICLES } from "./dlpt";
+import { DLPT_ARTICLES_2 } from "./dlpt2";
 
 /**
  * Graded news stories. These are original, news-style texts written for
@@ -193,4 +194,4 @@ const BASE_ARTICLES: Article[] = [
 ];
 
 /** Newest first, so the exam-prep stories lead the feed. */
-export const ARTICLES: Article[] = [...DLPT_ARTICLES, ...BASE_ARTICLES].sort((a, b) => b.date.localeCompare(a.date));
+export const ARTICLES: Article[] = [...DLPT_ARTICLES, ...DLPT_ARTICLES_2, ...BASE_ARTICLES].sort((a, b) => b.date.localeCompare(a.date));

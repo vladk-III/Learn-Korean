@@ -70,7 +70,7 @@ export const DLPT_RESOURCES: Resource[] = [
   {
     title: "Your Quizlet set: Korean DLPT 1–100",
     url: "https://quizlet.com/712290586/1-korean-dlpt-1-100-flash-cards/",
-    note: "Pair with this app's DLPT vocabulary set in Study.",
+    note: "Your uploaded sets (1–300 + lower-level) are built into Study as flashcards and Type It!",
   },
   {
     title: "Easy Korean News (쉬운 한국어 뉴스) app",

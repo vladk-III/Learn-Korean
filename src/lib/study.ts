@@ -1,6 +1,7 @@
 /** Study sets for flashcards and the typing game (Quizlet-style practice). */
 import { ARTICLES } from "@/content/articles";
 import { CLIPS } from "@/content/clips";
+import { DLPT_1_100, DLPT_101_200, DLPT_201_300, DLPT_LOWER, type BankTerm } from "@/content/dlptBank";
 import type { Content, Topic } from "@/content/types";
 import { tokenize } from "./analyzer";
 import { State } from "./fsrs";
@@ -82,6 +83,43 @@ function trackItems(track: "dlpt" | "opi"): StudyItem[] {
     .filter((it) => !seen.has(it.ko) && seen.add(it.ko));
 }
 
+/** Strip a final 다 / 하다 / 되다 so 검거하다 also matches 검거했습니다. */
+const stemOf = (ko: string) => ko.replace(/\s+/g, " ").replace(/(하다|되다|다)$/, "");
+
+/**
+ * Quizlet terms become study items; where a story uses the word we attach
+ * that sentence so it can be shown in context and mined into reviews.
+ */
+function bankItems(terms: BankTerm[], setTitle: string): StudyItem[] {
+  const sentences = [...ARTICLES, ...CLIPS].flatMap((c) => c.sentences.map((s) => ({ c, s })));
+  return terms.map((t) => {
+    const stem = stemOf(t.ko);
+    // Only match at the start of a word so 수직 doesn't hit inside another word.
+    const re = new RegExp(`(?:^|\\s)(${stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[^\\s.,?!]*)`);
+    const hit = stem.length >= 2 ? sentences.find(({ s }) => re.test(s.ko)) : undefined;
+    const target = hit?.s.ko.match(re)?.[1];
+    return {
+      ko: t.ko,
+      en: t.en,
+      alt: t.alt ?? [],
+      sentence: hit?.s.ko,
+      sentenceEn: hit?.s.en,
+      target,
+      sourceId: hit?.c.id ?? "quizlet-dlpt",
+      sourceTitle: hit?.c.title ?? setTitle,
+      sourceKind: hit?.c.kind ?? "news",
+      notes: t.full ? [`Quizlet card: ${t.full}`] : [],
+    };
+  });
+}
+
+const BANK: { id: string; title: string; terms: BankTerm[] }[] = [
+  { id: "quizlet-dlpt-1", title: "Quizlet DLPT 1–100", terms: DLPT_1_100 },
+  { id: "quizlet-dlpt-2", title: "Quizlet DLPT 101–200", terms: DLPT_101_200 },
+  { id: "quizlet-dlpt-3", title: "Quizlet DLPT 201–300", terms: DLPT_201_300 },
+  { id: "quizlet-dlpt-lower", title: "Quizlet lower-level DLPT", terms: DLPT_LOWER },
+];
+
 export function studySets(d: Data): StudySet[] {
   const sets: StudySet[] = [
     {
@@ -100,6 +138,14 @@ export function studySets(d: Data): StudySet[] {
       topic: "Culture",
       items: trackItems("opi"),
     },
+    ...BANK.map((b) => ({
+      id: b.id,
+      title: b.title,
+      subtitle: `Your Quizlet cards · ${b.terms.length} terms`,
+      emoji: "📇",
+      topic: "Security" as Topic,
+      items: bankItems(b.terms, b.title),
+    })),
   ];
   if (d.cards.length)
     sets.push({

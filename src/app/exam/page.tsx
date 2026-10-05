@@ -8,6 +8,14 @@ import { DLPT_RESOURCES, OPI_QUESTIONS, OPI_RESOURCES, OPI_TIPS, type Resource }
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useData, useHydrated } from "@/lib/store";
 import { tintCircle, type Tint } from "@/lib/tints";
+import { DLPT_1_100, DLPT_101_200, DLPT_201_300, DLPT_LOWER } from "@/content/dlptBank";
+
+const QUIZLET_SETS = [
+  { id: "quizlet-dlpt-1", title: "Quizlet DLPT 1–100", note: `${DLPT_1_100.length} terms · 가격 → 귀금속` },
+  { id: "quizlet-dlpt-2", title: "Quizlet DLPT 101–200", note: `${DLPT_101_200.length} terms · 기아 → 무료` },
+  { id: "quizlet-dlpt-3", title: "Quizlet DLPT 201–300", note: `${DLPT_201_300.length} terms · 무리하게 → 살신성인` },
+  { id: "quizlet-dlpt-lower", title: "Quizlet lower-level DLPT", note: `${DLPT_LOWER.length} terms · 가격인상 → 구입하다` },
+];
 
 type Level = 1 | 2 | 3;
 
@@ -219,6 +227,12 @@ export default function Exam() {
           <div className="mt-4 space-y-2">
             <AppLink href="/news/?track=dlpt" icon={BookOpen} tint="rose" title="DLPT-style news" note="Security, politics, economy, North Korea — read & listen" />
             <AppLink href="/study/flashcards/?set=dlpt-core" icon={SquareStack} tint="peach" title="DLPT core vocabulary" note="Flashcards & Type It! from every DLPT story" />
+          </div>
+          <p className="label mt-5">Your Quizlet cards</p>
+          <div className="mt-2 space-y-2">
+            {QUIZLET_SETS.map((s) => (
+              <AppLink key={s.id} href={`/study/flashcards/?set=${s.id}`} icon={SquareStack} tint="butter" title={s.title} note={s.note} />
+            ))}
           </div>
           <p className="label mt-5">Resources</p>
           <div className="mt-2">
