@@ -1,0 +1,175 @@
+// Server-side schema for when the app grows a sync backend (Supabase/Postgres).
+// The current app is local-first: src/lib/store.ts keeps the same shapes in
+// localStorage, so syncing is a straight mapping of these models.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Cefr {
+  A1
+  A2
+  B1
+  B2
+  C1
+}
+
+enum ContentKind {
+  NEWS
+  CLIP
+}
+
+enum CardState {
+  NEW
+  LEARNING
+  REVIEW
+  RELEARNING
+}
+
+enum Exercise {
+  REBUILD // reading: unscramble the sentence
+  CLOZE // writing: type the missing target word
+  LISTEN // listening: hear the sentence, type the target
+  SHADOW // speaking: repeat the sentence, scored by speech recognition
+}
+
+model User {
+  id               String          @id @default(uuid())
+  email            String          @unique
+  createdAt        DateTime        @default(now())
+  placementLevel   Int             @default(0) // 0=new … 4=B2; dictionary words <= level count as known
+  newCardsPerDay   Int             @default(20) // capped 15–25 in the UI
+  targetRetention  Float           @default(0.9) // FSRS request retention, 0.85–0.90 recommended
+  strictReviewMode Boolean         @default(true) // block mining while reviews are overdue
+  dailyGoalMinutes Int             @default(20)
+  fsrsWeights      Float[] // per-user optimised FSRS weights (empty = defaults)
+  knownWords       UserWord[]
+  minedSentences   MinedSentence[]
+  reviews          SrsReview[]
+  studyDays        StudyDay[]
+  articles         Article[] // articles the user pasted in
+}
+
+model Word {
+  id        String          @id @default(uuid())
+  lemma     String          @unique // dictionary form, e.g. 먹다
+  pos       String // n, v, a, adv, …
+  level     Int // 1=A1 … 5=C1
+  gloss     String
+  forms     String[] // irregular surface forms
+  audioUrl  String?
+  userWords UserWord[]
+  mined     MinedSentence[]
+}
+
+/// Words a user has marked as known (or that matured out of SRS).
+model UserWord {
+  userId    String
+  wordId    String
+  status    String   @default("known") // known | ignored
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word      Word     @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@id([userId, wordId])
+}
+
+model Article {
+  id          String          @id @default(uuid())
+  kind        ContentKind     @default(NEWS)
+  title       String
+  titleEn     String?
+  topic       String
+  level       Cefr
+  publishedAt DateTime
+  sourceUrl   String?
+  mediaUrl    String? // audio/video for clips
+  ownerId     String? // null = shared catalogue; set = user-imported
+  owner       User?           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  sentences   ArticleSentence[]
+  mined       MinedSentence[]
+
+  @@index([level, topic])
+}
+
+model ArticleSentence {
+  id        String  @id @default(uuid())
+  articleId String
+  position  Int
+  ko        String
+  en        String?
+  startMs   Int? // subtitle / audio alignment
+  endMs     Int?
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, position])
+}
+
+/// A mined sentence is one flashcard: exactly one target word (1T rule).
+model MinedSentence {
+  id            String      @id @default(uuid())
+  userId        String
+  wordId        String?
+  articleId     String?
+  sentence      String
+  translation   String?
+  target        String // surface form as it appears in the sentence
+  lemma         String
+  gloss         String
+  grammarNotes  String[]
+  audioUrl      String?
+  createdAt     DateTime    @default(now())
+  // FSRS memory state
+  state         CardState   @default(NEW)
+  due           DateTime    @default(now())
+  stability     Float       @default(0)
+  difficulty    Float       @default(0)
+  elapsedDays   Int         @default(0)
+  scheduledDays Int         @default(0)
+  reps          Int         @default(0)
+  lapses        Int         @default(0)
+  lastReview    DateTime?
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word          Word?       @relation(fields: [wordId], references: [id])
+  article       Article?    @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  reviews       SrsReview[]
+
+  @@unique([userId, sentence, lemma])
+  @@index([userId, due])
+}
+
+/// Append-only review log — also the training data for FSRS weight optimisation.
+model SrsReview {
+  id            String        @id @default(uuid())
+  userId        String
+  cardId        String
+  reviewedAt    DateTime      @default(now())
+  rating        Int // 1 Again, 2 Hard, 3 Good, 4 Easy
+  exercise      Exercise
+  prevState     CardState
+  elapsedDays   Int
+  scheduledDays Int
+  correct       Boolean?
+  durationMs    Int?
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card          MinedSentence @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([userId, reviewedAt])
+}
+
+model StudyDay {
+  userId   String
+  day      DateTime @db.Date
+  seconds  Int      @default(0)
+  reviews  Int      @default(0)
+  newCards Int      @default(0)
+  mined    Int      @default(0)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, day])
+}
