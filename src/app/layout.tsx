@@ -25,6 +25,17 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {base && (
+          // GitHub Pages serves /learn-korean/ and /Learn-Korean/ alike, but the app's
+          // install scope is case-sensitive — normalise the URL so Chrome offers "Install".
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(b){var p=location.pathname;if(p.indexOf(b)!==0&&p.toLowerCase().indexOf(b.toLowerCase())===0)location.replace(b+p.slice(b.length)+location.search+location.hash)})(${JSON.stringify(base)})`,
+            }}
+          />
+        )}
+      </head>
       <body className="font-sans antialiased">
         <AppShell>{children}</AppShell>
       </body>

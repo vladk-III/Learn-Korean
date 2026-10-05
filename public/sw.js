@@ -1,5 +1,5 @@
 // Offline support: network-first for pages, cache-first for hashed static assets.
-const CACHE = "learn-korean-v1";
+const CACHE = "learn-korean-v2";
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (e) => {
