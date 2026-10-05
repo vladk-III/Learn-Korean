@@ -117,6 +117,7 @@ export default function Me() {
                   {c.lemma} — {c.gloss}
                 </p>
                 <p className="muted text-[11px]">
+                  {c.fromQuiz && "📝 from quiz · "}
                   {STATE_LABEL[c.fsrs.state]}
                   {c.fsrs.state !== State.New &&
                     ` · due ${c.fsrs.due <= now ? "now" : "in " + formatInterval(c.fsrs.due - now)} · recall ${Math.round(cardRetrievability(c.fsrs, now) * 100)}%`}

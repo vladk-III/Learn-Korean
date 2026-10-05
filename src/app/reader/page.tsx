@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Eye, EyeOff, Languages, Pause, Play, Volume2 } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Languages, ListChecks, Pause, Play, Volume2 } from "lucide-react";
 import InteractiveSentence from "@/components/InteractiveSentence";
 import WordSheet from "@/components/WordSheet";
 import CoverageBadge from "@/components/CoverageBadge";
+import Quiz from "@/components/Quiz";
 import type { Token } from "@/lib/analyzer";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { actions, coverage, findContent, useData, useHydrated } from "@/lib/store";
@@ -24,6 +25,8 @@ function Reader() {
   const [showEn, setShowEn] = useState(false);
   const [highlight, setHighlight] = useState(true);
   const [sel, setSel] = useState<{ token: Token; i: number } | null>(null);
+  const [quiz, setQuiz] = useState(false);
+  const tapped = useRef<string[]>([]);
   const playingRef = useRef(false);
   const lineRefs = useRef<(HTMLParagraphElement | null)[]>([]);
 
@@ -40,6 +43,8 @@ function Reader() {
       if (!content || i >= content.sentences.length) {
         stop();
         setCurrent(null);
+        // Read-aloud reached the end of the article: quick retention check.
+        if (content) setQuiz(true);
         return;
       }
       playingRef.current = continuous;
@@ -68,6 +73,7 @@ function Reader() {
     );
 
   const cov = coverage(d, content);
+  const lastQuiz = [...d.quizzes].reverse().find((q) => q.contentId === content.id);
   const kind = content.kind;
 
   return (
@@ -133,12 +139,31 @@ function Reader() {
                 selected={sel?.i === i ? sel.token.core : null}
                 onWord={(token) => {
                   stop();
+                  tapped.current.push(token.gloss.lemma);
                   setSel({ token, i });
                 }}
               />
               {showEn && s.en && <span className="muted block text-sm">{s.en}</span>}
             </p>
           ))}
+        </div>
+
+        <div className="card mt-8 p-4 text-center">
+          <p className="font-bold">Finished reading?</p>
+          <p className="muted text-sm">
+            {lastQuiz
+              ? `Last quiz: ${lastQuiz.score}/${lastQuiz.total}. Take it again to check what stuck.`
+              : "Take a 1-minute quiz. Missed words go to your review deck."}
+          </p>
+          <button
+            onClick={() => {
+              stop();
+              setQuiz(true);
+            }}
+            className="bg-brand-500 mt-3 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 font-bold text-white shadow-[0_4px_0_var(--color-brand-700)] active:translate-y-1 active:shadow-none"
+          >
+            <ListChecks size={20} /> Done reading — quick quiz
+          </button>
         </div>
 
         {cov.unknownLemmas.length > 0 && (
@@ -173,6 +198,8 @@ function Reader() {
           </button>
         </div>
       </div>
+
+      {quiz && <Quiz content={content} tapped={tapped.current} onClose={() => setQuiz(false)} />}
 
       {sel && (
         <WordSheet

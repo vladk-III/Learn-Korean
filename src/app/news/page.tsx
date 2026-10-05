@@ -71,6 +71,14 @@ export default function News() {
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <CoverageBadge pct={cov.pct} />
                   <span className="muted text-xs">{cov.unknownLemmas.length} new words</span>
+                  {(() => {
+                    const q = [...d.quizzes].reverse().find((x) => x.contentId === a.id);
+                    return q ? (
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300">
+                        ✓ quiz {q.score}/{q.total}
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
               </div>
             </Link>

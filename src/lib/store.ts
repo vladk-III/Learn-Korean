@@ -45,6 +45,16 @@ export interface MinedCard {
   sourceKind: "news" | "clip";
   createdAt: number;
   fsrs: Card;
+  /** Added automatically because it was missed in a post-reading quiz. */
+  fromQuiz?: boolean;
+}
+
+export interface QuizResult {
+  contentId: string;
+  ts: number;
+  score: number;
+  total: number;
+  missed: string[]; // lemmas
 }
 
 export interface ReviewEntry {
@@ -73,6 +83,7 @@ export interface Data {
   log: ReviewEntry[];
   days: Record<string, DayStats>;
   imported: Article[];
+  quizzes: QuizResult[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -96,6 +107,7 @@ const empty = (): Data => ({
   log: [],
   days: {},
   imported: [],
+  quizzes: [],
 });
 
 let data: Data = empty();
@@ -355,6 +367,30 @@ export const actions = {
     };
     commit({ ...d, imported: [a, ...d.imported] });
     return a;
+  },
+
+  /**
+   * Add words missed in a quiz to the review deck. Not subject to the
+   * review-first lock (the learner didn't choose to mine these), and words
+   * already in the deck are left alone.
+   */
+  addMissedWords(items: Omit<MinedCard, "id" | "createdAt" | "fsrs" | "fromQuiz">[]): number {
+    const d = getData();
+    const have = new Set(d.cards.map((c) => c.lemma));
+    const fresh: MinedCard[] = [];
+    for (const it of items) {
+      if (have.has(it.lemma)) continue;
+      have.add(it.lemma);
+      fresh.push({ ...it, id: uid(), createdAt: Date.now(), fsrs: newCard(), fromQuiz: true });
+    }
+    const lemmas = new Set(items.map((i) => i.lemma));
+    commit({ ...d, cards: [...d.cards, ...fresh], known: d.known.filter((k) => !lemmas.has(k)) });
+    return fresh.length;
+  },
+
+  recordQuiz(r: QuizResult) {
+    const d = getData();
+    commit({ ...d, quizzes: [...d.quizzes, r].slice(-500) });
   },
 
   deleteImported(id: string) {

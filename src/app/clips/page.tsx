@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { FileText, Languages, Mic, Pause, Play, RotateCcw } from "lucide-react";
+import { FileText, Languages, ListChecks, Mic, Pause, Play, RotateCcw } from "lucide-react";
 import { CLIPS } from "@/content/clips";
 import type { Clip } from "@/content/types";
 import InteractiveSentence from "@/components/InteractiveSentence";
 import WordSheet from "@/components/WordSheet";
 import CoverageBadge from "@/components/CoverageBadge";
+import Quiz from "@/components/Quiz";
 import type { Token } from "@/lib/analyzer";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { coverage, useData, useHydrated, type Data } from "@/lib/store";
@@ -34,6 +35,8 @@ function ClipCard({
   const [shadow, setShadow] = useState(false);
   const [waiting, setWaiting] = useState(false);
   const [sel, setSel] = useState<Token | null>(null);
+  const [quiz, setQuiz] = useState(false);
+  const tapped = useRef<string[]>([]);
   const playingRef = useRef(false);
   const timer = useRef<number | undefined>(undefined);
 
@@ -48,7 +51,9 @@ function ClipCard({
   const playLine = useCallback(
     (i: number) => {
       if (i >= clip.sentences.length) {
+        // Reached the end of the clip: check what stuck.
         stop();
+        setQuiz(true);
         return;
       }
       playingRef.current = true;
@@ -138,6 +143,7 @@ function ClipCard({
           { icon: RotateCcw, label: "Replay", on: () => start(0), active: false },
           { icon: Languages, label: "English", on: () => setShowEn((v) => !v), active: showEn },
           { icon: Mic, label: "Shadow", on: () => setShadow((v) => !v), active: shadow },
+          { icon: ListChecks, label: "Quiz", on: () => (stop(), setQuiz(true)), active: false },
         ].map(({ icon: Icon, label, on, active: a }) => (
           <button key={label} onClick={on} className="flex flex-col items-center text-[10px] font-bold">
             <span className={`rounded-full p-3 backdrop-blur ${a ? "bg-white text-black" : "bg-black/25"}`}>
@@ -176,12 +182,15 @@ function ClipCard({
               onWord={(t) => {
                 stop();
                 setSel(t);
+                tapped.current.push(t.gloss.lemma);
               }}
             />
           </p>
           {showEn && <p className="mt-1 text-sm opacity-90">{s.en}</p>}
         </div>
       </div>
+
+      {quiz && <Quiz content={clip} tapped={tapped.current} onClose={() => setQuiz(false)} />}
 
       {sel && (
         <div className="text-[var(--fg)]">

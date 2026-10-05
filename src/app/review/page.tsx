@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { BookOpen, Clapperboard, PartyPopper, Volume2, X } from "lucide-react";
-import { Rating, formatInterval } from "@/lib/fsrs";
+import { BookOpen, Clapperboard, ListChecks, PartyPopper, Volume2, X } from "lucide-react";
+import { Rating, State, formatInterval } from "@/lib/fsrs";
 import { speak } from "@/lib/speech";
 import { tokenize } from "@/lib/analyzer";
 import type { Verdict } from "@/lib/text";
@@ -67,10 +67,18 @@ export default function Review() {
   const due = dueCards(d);
   const fresh = newQueue(d);
 
-  const start = () => {
+  const now = Date.now();
+  // Words missed in post-reading quizzes that haven't matured yet.
+  const missed = d.cards
+    .filter((c) => c.fromQuiz && !(c.fsrs.state === State.Review && c.fsrs.stability >= 21))
+    .sort((a, b) => b.createdAt - a.createdAt);
+  // Practising missed words on demand bypasses the daily new-card cap.
+  const missedReady = missed.filter((c) => c.fsrs.state === State.New || c.fsrs.due <= now);
+
+  const start = (ids = [...due, ...fresh].map((c) => c.id)) => {
     setStats({ done: 0, correct: 0 });
     setResult(null);
-    setQueue([...due, ...fresh].map((c) => c.id));
+    setQueue(ids);
   };
 
   // ---------- start screen ----------
@@ -111,7 +119,7 @@ export default function Review() {
 
         {total > 0 ? (
           <button
-            onClick={start}
+            onClick={() => start()}
             className="bg-brand-500 mt-6 w-full rounded-2xl py-4 text-lg font-bold text-white shadow-[0_4px_0_var(--color-brand-700)] active:translate-y-1 active:shadow-none"
           >
             Start {total} card{total > 1 ? "s" : ""}
@@ -134,6 +142,37 @@ export default function Review() {
               </Link>
             </div>
           </div>
+        )}
+
+        {missed.length > 0 && (
+          <section className="mt-8">
+            <h2 className="mb-2 flex items-center gap-2 text-sm font-bold tracking-wide uppercase">
+              <ListChecks size={16} /> Missed in quizzes ({missed.length})
+            </h2>
+            <div className="card divide-y divide-[var(--line)]">
+              {missed.slice(0, 30).map((c) => (
+                <div key={c.id} className="flex items-center gap-3 px-4 py-2.5">
+                  <button onClick={() => speak(c.target, { rate: d.settings.ttsRate })} aria-label="Play" className="text-brand-500">
+                    <Volume2 size={16} />
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <p className="ko font-bold">{c.lemma}</p>
+                    <p className="muted truncate text-xs">{c.gloss}</p>
+                  </div>
+                  <span className="muted shrink-0 text-xs">
+                    {c.fsrs.state === State.New ? "new" : c.fsrs.due <= now ? "due" : `in ${formatInterval(c.fsrs.due - now)}`}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => start(missedReady.map((c) => c.id))}
+              disabled={missedReady.length === 0}
+              className="mt-3 w-full rounded-2xl bg-amber-500 py-3.5 font-bold text-white shadow-[0_4px_0_#b45309] active:translate-y-1 active:shadow-none disabled:opacity-40"
+            >
+              {missedReady.length ? `Practise ${missedReady.length} missed word${missedReady.length > 1 ? "s" : ""}` : "All scheduled — nothing due yet"}
+            </button>
+          </section>
         )}
       </div>
     );
