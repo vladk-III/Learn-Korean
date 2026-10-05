@@ -179,7 +179,7 @@ function Flashcards() {
 
       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-line">
         <div className="flex h-full">
-          <div className="bg-ink transition-all" style={{ width: `${(know.length / Math.max(1, round.length)) * 100}%` }} />
+          <div className="bg-sage transition-all" style={{ width: `${(know.length / Math.max(1, round.length)) * 100}%` }} />
           <div className="bg-accent transition-all" style={{ width: `${(learning.length / Math.max(1, round.length)) * 100}%` }} />
         </div>
       </div>
@@ -227,7 +227,7 @@ function Flashcards() {
             {dx !== 0 && (
               <span
                 className={`absolute top-6 rounded-full px-4 py-1.5 text-sm font-semibold ${
-                  dx > 0 ? "left-6 bg-ink text-on-ink" : "right-6 bg-accent text-white"
+                  dx > 0 ? "left-6 bg-sage text-white" : "right-6 bg-peach text-white"
                 }`}
                 style={{ opacity: Math.min(1, Math.abs(dx) / 90) }}
               >
@@ -239,7 +239,7 @@ function Flashcards() {
               onPointerUp={(e) => e.stopPropagation()}
               onClick={() => speak(card.ko, { rate: d.settings.ttsRate })}
               aria-label="Play audio"
-              className="absolute top-5 right-5 z-10 flex size-11 items-center justify-center rounded-full bg-ink text-on-ink"
+              className="absolute top-5 right-5 z-10 flex size-11 items-center justify-center rounded-full bg-sky-soft text-sky"
             >
               <Volume2 size={18} strokeWidth={1.75} />
             </button>
@@ -248,13 +248,13 @@ function Flashcards() {
           <div className="mt-5 grid grid-cols-2 gap-3 pb-4">
             <button
               onClick={() => answer(false)}
-              className="btn btn-line h-14"
+              className="btn h-14 bg-peach-soft text-peach"
             >
-              <X size={18} strokeWidth={1.75} className="text-accent" /> Still learning
+              <X size={18} strokeWidth={1.75} /> Still learning
             </button>
             <button
               onClick={() => answer(true)}
-              className="btn btn-ink h-14"
+              className="btn h-14 bg-sage-soft text-sage"
             >
               <Check size={18} strokeWidth={1.75} /> Know it
             </button>
@@ -266,11 +266,11 @@ function Flashcards() {
             {learning.length === 0 ? "You know them all!" : `Round ${roundNo} done`}
           </h2>
           <div className="mt-5 grid grid-cols-2 gap-3">
-            <div className="tile p-4">
+            <div className="rounded-[1.4rem] bg-sage-soft p-4">
               <p className="font-medium">Know</p>
               <p className="num-thin mt-4 text-[2.4rem] leading-none">{know.length}</p>
             </div>
-            <div className="tile p-4">
+            <div className="rounded-[1.4rem] bg-peach-soft p-4">
               <p className="font-medium">Still learning</p>
               <p className="num-thin mt-4 text-[2.4rem] leading-none text-accent">{learning.length}</p>
             </div>

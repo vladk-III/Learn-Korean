@@ -104,7 +104,7 @@ export default function WordSheet({ token: tapped, sentence, source, onClose }: 
           <button
             onClick={() => speak(target.core, { rate: d.settings.ttsRate })}
             aria-label="Play word"
-            className="flex size-14 shrink-0 items-center justify-center rounded-full bg-ink text-on-ink"
+            className="flex size-14 shrink-0 items-center justify-center rounded-full bg-accent text-white"
           >
             <Volume2 size={22} strokeWidth={1.75} />
           </button>
@@ -125,9 +125,9 @@ export default function WordSheet({ token: tapped, sentence, source, onClose }: 
           {entry ? (
             <>
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="pill pill-soft">{POS_LABEL[entry.pos]}</span>
-                <span className="pill pill-soft">{LEVEL[entry.level]}</span>
-                <span className={status === "new" ? "pill" : "pill pill-outline"}>{status}</span>
+                <span className="pill bg-sky-soft text-sky">{POS_LABEL[entry.pos]}</span>
+                <span className="pill bg-lilac-soft text-lilac">{LEVEL[entry.level]}</span>
+                <span className={status === "new" ? "pill" : status === "learning" ? "pill bg-butter-soft text-butter" : "pill bg-sage-soft text-sage"}>{status}</span>
               </div>
               <p className="mt-3 text-xl font-semibold tracking-tight">{entry.en}</p>
             </>

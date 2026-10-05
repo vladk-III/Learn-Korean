@@ -1,5 +1,7 @@
-/** Thin progress arc, like the oven timer rings in the reference. */
-export default function Arc({ value, size = 44 }: { value: number; size?: number }) {
+import { TINT, type Tint } from "@/lib/tints";
+
+/** Thin progress arc, like the timer rings in the reference. */
+export default function Arc({ value, size = 44, tone }: { value: number; size?: number; tone?: Tint }) {
   const r = 18;
   const c = 2 * Math.PI * r;
   return (
@@ -14,9 +16,8 @@ export default function Arc({ value, size = 44 }: { value: number; size?: number
         strokeLinecap="round"
         strokeDasharray={c}
         strokeDashoffset={c * (1 - Math.max(0.02, Math.min(1, value)))}
-        className="stroke-ink transition-all duration-700"
+        className={`${tone ? TINT[tone].stroke : "stroke-ink"} transition-all duration-700`}
       />
     </svg>
   );
 }
-

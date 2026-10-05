@@ -112,7 +112,7 @@ export default function Reminders() {
         </div>
       ) : !r.code ? (
         <>
-          <button onClick={turnOn} disabled={busy} className="btn btn-ink mt-4 h-14 w-full text-base">
+          <button onClick={turnOn} disabled={busy} className="btn btn-accent mt-4 h-14 w-full text-base">
             <BellRing size={18} strokeWidth={1.75} /> {busy ? "Setting up…" : "Turn on reminders"}
           </button>
           <p className="muted mt-2 text-center text-xs">Your phone will ask to allow notifications.</p>
@@ -121,7 +121,7 @@ export default function Reminders() {
         <div className="mt-4 space-y-4">
           <div className="card p-4">
             <div className="flex items-center gap-3">
-              <span className="icon-circle size-10">
+              <span className="icon-circle size-10 bg-butter-soft text-butter">
                 <BellRing size={17} strokeWidth={1.75} />
               </span>
               <div className="flex-1">

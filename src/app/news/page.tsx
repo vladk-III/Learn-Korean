@@ -47,7 +47,7 @@ export default function News() {
         <Link
           href="/news/import/"
           aria-label="Paste an article"
-          className="mt-1 flex size-12 items-center justify-center rounded-full bg-ink text-on-ink"
+          className="mt-1 flex size-12 items-center justify-center rounded-full bg-sky-soft text-sky"
         >
           <ClipboardPaste size={20} strokeWidth={1.75} />
         </Link>

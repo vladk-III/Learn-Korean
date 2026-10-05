@@ -6,6 +6,7 @@ import { ARTICLES } from "@/content/articles";
 import { CLIPS } from "@/content/clips";
 import CoverageBadge from "@/components/CoverageBadge";
 import Arc from "@/components/Arc";
+import { TINT, tintCircle, type Tint } from "@/lib/tints";
 import { activeToday, blockingDue, coverage, dueCards, newQueue, streak, today, useData, useHydrated } from "@/lib/store";
 
 function greeting(): [string, string] {
@@ -19,12 +20,14 @@ function greeting(): [string, string] {
 function Row({
   href,
   icon: Icon,
+  tint,
   title,
   status,
   extra,
 }: {
   href: string;
   icon: typeof Layers;
+  tint: Tint;
   title: string;
   status: string;
   extra?: React.ReactNode;
@@ -32,7 +35,7 @@ function Row({
   return (
     <li>
       <Link href={href} className="card flex items-center gap-4 px-4 py-4">
-        <span className="icon-circle size-12">
+        <span className={`${tintCircle(tint)} size-12`}>
           <Icon size={20} strokeWidth={1.75} />
         </span>
         <div className="min-w-0 flex-1">
@@ -79,17 +82,17 @@ export default function Today() {
           <span className="muted block">{g2}</span>
         </h1>
         <div className="mt-1 flex items-center gap-2.5">
-          <Link href="/me/#reminders" aria-label="Streak reminders" className="flex size-12 items-center justify-center rounded-full bg-sheet">
+          <Link href="/me/#reminders" aria-label="Streak reminders" className={`flex size-12 items-center justify-center rounded-full ${TINT.butter.soft} ${TINT.butter.ink}`}>
             <AlarmClock size={21} strokeWidth={1.75} />
           </Link>
           <Link
             href="/me/"
             aria-label={`${s} day streak`}
-            className="relative flex size-12 items-center justify-center rounded-full bg-ink text-on-ink"
+            className="relative flex size-12 items-center justify-center rounded-full bg-accent text-white"
           >
             <Flame size={20} strokeWidth={1.75} />
             {s > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-5 rounded-full border-2 border-canvas bg-accent px-1 text-center text-[10px] leading-4 font-semibold text-white">
+              <span className="absolute -top-1 -right-1 min-w-5 rounded-full border-2 border-canvas bg-ink px-1 text-center text-[10px] leading-4 font-semibold text-on-ink">
                 {s}
               </span>
             )}
@@ -109,28 +112,28 @@ export default function Today() {
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-3">
-          <div className="tile flex min-h-40 flex-col justify-between p-4">
+          <div className="flex min-h-40 flex-col justify-between rounded-[1.4rem] bg-peach-soft p-4">
             <div className="flex items-start justify-between gap-2">
               <p className="leading-tight font-medium">
                 Minutes
                 <br />
                 today
               </p>
-              <Arc value={minutes / goal} />
+              <Arc value={minutes / goal} tone="peach" />
             </div>
             <p className="num-thin text-[2.6rem] leading-none">
               {minutes}
               <span className="muted text-2xl">/{goal}</span>
             </p>
           </div>
-          <Link href="/review/" className="tile flex min-h-40 flex-col justify-between p-4">
+          <Link href="/review/" className="flex min-h-40 flex-col justify-between rounded-[1.4rem] bg-sky-soft p-4">
             <div className="flex items-start justify-between gap-2">
               <p className="leading-tight font-medium">
                 Cards
                 <br />
                 waiting
               </p>
-              <Arc value={reviewsDone ? 1 : t.reviews / Math.max(1, t.reviews + due + fresh)} />
+              <Arc value={reviewsDone ? 1 : t.reviews / Math.max(1, t.reviews + due + fresh)} tone="sky" />
             </div>
             <p className="num-thin text-[2.6rem] leading-none">{due + fresh}</p>
           </Link>
@@ -157,18 +160,20 @@ export default function Today() {
           <Row
             href="/review/"
             icon={Layers}
+            tint="peach"
             title="Clear reviews"
             status={reviewsDone ? "All clear" : `${due} due · ${fresh} new`}
           />
           <Row
             href={`/reader/?id=${pick.a.id}`}
             icon={blocked > 0 ? Lock : BookOpen}
+            tint="sky"
             title={pick.a.title}
             status={blocked > 0 ? "Reading only — clear reviews to save words" : pick.a.titleEn}
             extra={<CoverageBadge pct={pick.cov.pct} />}
           />
-          <Row href={`/clips/?id=${clip.id}`} icon={Clapperboard} title={clip.title} status={`Clip · ${clip.titleEn}`} />
-          <Row href="/study/" icon={SquareStack} title="Flashcards & Type It!" status="Practice games" />
+          <Row href={`/clips/?id=${clip.id}`} icon={Clapperboard} tint="lilac" title={clip.title} status={`Clip · ${clip.titleEn}`} />
+          <Row href="/study/" icon={SquareStack} tint="sage" title="Flashcards & Type It!" status="Practice games" />
         </ul>
       </div>
     </div>

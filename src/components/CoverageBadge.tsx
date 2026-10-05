@@ -1,11 +1,11 @@
 import { coverageLabel } from "@/lib/store";
 
-// Only the i+1 sweet spot gets the orange accent; everything else stays neutral.
+// Green = easy, orange = the i+1 sweet spot, yellow = stretch, rose = hard.
 const TONE = {
-  easy: "pill pill-soft",
+  easy: "pill bg-sage-soft text-sage",
   sweet: "pill",
-  stretch: "pill pill-outline",
-  hard: "pill pill-outline",
+  stretch: "pill bg-butter-soft text-butter",
+  hard: "pill bg-rose-soft text-rose",
 };
 
 export default function CoverageBadge({ pct, compact = false }: { pct: number; compact?: boolean }) {

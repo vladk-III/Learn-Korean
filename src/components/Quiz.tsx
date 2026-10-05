@@ -141,9 +141,9 @@ export default function Quiz({ content, tapped, onClose }: Props) {
                     const style = !answered
                       ? "card"
                       : isAnswer
-                        ? "bg-ink text-on-ink"
+                        ? "border border-sage bg-sage-soft text-sage"
                         : k === chosen
-                          ? "card border-bad text-bad"
+                          ? "border border-rose bg-rose-soft text-rose"
                           : "card opacity-40";
                     return (
                       <button
@@ -196,7 +196,7 @@ export default function Quiz({ content, tapped, onClose }: Props) {
                 : "Missed words are now in your review deck, so they'll come back before you forget them."}
             </p>
             {wrong.some((q) => q.miss) && (
-              <div className="tile mt-5 p-4">
+              <div className="mt-5 rounded-[1.4rem] bg-peach-soft p-4">
                 <span className="pill">Added to review</span>
                 <ul className="mt-3 space-y-1.5">
                   {wrong

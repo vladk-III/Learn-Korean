@@ -79,7 +79,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 >
                   <span
                     className={`flex h-9 w-12 items-center justify-center rounded-full transition-colors ${
-                      active ? "bg-ink text-on-ink" : ""
+                      active ? "bg-accent-soft text-accent" : ""
                     }`}
                   >
                     <Icon size={20} strokeWidth={1.75} />

@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import Arc from "@/components/Arc";
+import { tintCircle } from "@/lib/tints";
 import { Rating, State, formatInterval } from "@/lib/fsrs";
 import { speak } from "@/lib/speech";
 import { tokenize } from "@/lib/analyzer";
@@ -41,6 +42,14 @@ const FOCUS: { v: Skill | undefined; label: string; icon: typeof Mic }[] = [
   { v: "listening", label: "Listening", icon: Ear },
   { v: "speaking", label: "Speaking", icon: Mic },
 ];
+
+// Again rose · Hard butter · Good sage · Easy sky; the suggested one is filled in.
+const RATING: Record<Rating, { ink: string; solid: string }> = {
+  [Rating.Again]: { ink: "text-rose", solid: "bg-rose" },
+  [Rating.Hard]: { ink: "text-butter", solid: "bg-butter" },
+  [Rating.Good]: { ink: "text-sage", solid: "bg-sage" },
+  [Rating.Easy]: { ink: "text-sky", solid: "bg-sky" },
+};
 
 const VERDICT_TO_RATING: Record<Verdict, Rating> = {
   correct: Rating.Good,
@@ -100,7 +109,7 @@ export default function Review() {
           <Link
             href="/study/"
             aria-label="Flashcards and games"
-            className="mt-1 flex size-12 items-center justify-center rounded-full bg-sheet"
+            className={`mt-1 flex size-12 items-center justify-center rounded-full ${tintCircle("sage")}`}
           >
             <SquareStack size={20} strokeWidth={1.75} />
           </Link>
@@ -108,25 +117,25 @@ export default function Review() {
 
         <div className="sheet min-h-[75dvh] px-5 pt-6 pb-6">
           <div className="grid grid-cols-2 gap-3">
-            <div className="tile flex min-h-36 flex-col justify-between p-4">
+            <div className="flex min-h-36 flex-col justify-between rounded-[1.4rem] bg-peach-soft p-4">
               <div className="flex items-start justify-between">
                 <p className="leading-tight font-medium">
                   Due
                   <br />
                   reviews
                 </p>
-                <Arc value={due.length ? 0.25 : 1} />
+                <Arc value={due.length ? 0.25 : 1} tone="peach" />
               </div>
               <p className="num-thin text-[2.6rem] leading-none">{due.length}</p>
             </div>
-            <div className="tile flex min-h-36 flex-col justify-between p-4">
+            <div className="flex min-h-36 flex-col justify-between rounded-[1.4rem] bg-sky-soft p-4">
               <div className="flex items-start justify-between">
                 <p className="leading-tight font-medium">
                   New
                   <br />
                   today
                 </p>
-                <Arc value={1 - fresh.length / Math.max(1, d.settings.newPerDay)} />
+                <Arc value={1 - fresh.length / Math.max(1, d.settings.newPerDay)} tone="sky" />
               </div>
               <p className="num-thin text-[2.6rem] leading-none">
                 {fresh.length}
@@ -174,7 +183,7 @@ export default function Review() {
           )}
 
           <Link href="/study/" className="card mt-3 flex items-center gap-4 px-4 py-4">
-            <span className="icon-circle size-12">
+            <span className={`${tintCircle("sage")} size-12`}>
               <SquareStack size={20} strokeWidth={1.75} />
             </span>
             <div className="flex-1">
@@ -196,7 +205,7 @@ export default function Review() {
                     <button
                       onClick={() => speak(c.target, { rate: d.settings.ttsRate })}
                       aria-label="Play"
-                      className="icon-circle size-10"
+                      className={`${tintCircle("rose")} size-10`}
                     >
                       <Volume2 size={16} strokeWidth={1.75} />
                     </button>
@@ -236,11 +245,11 @@ export default function Review() {
           <span className="muted block">Session done</span>
         </h1>
         <div className="mt-8 grid grid-cols-2 gap-3">
-          <div className="tile p-4">
+          <div className="rounded-[1.4rem] bg-sky-soft p-4">
             <p className="font-medium">Reviewed</p>
             <p className="num-thin mt-6 text-[2.6rem] leading-none">{stats.done}</p>
           </div>
-          <div className="tile p-4">
+          <div className="rounded-[1.4rem] bg-sage-soft p-4">
             <p className="font-medium">Recalled</p>
             <p className="num-thin mt-6 text-[2.6rem] leading-none">
               {pct}
@@ -322,7 +331,7 @@ export default function Review() {
                 <button
                   onClick={() => speak(card.sentence, { rate: d.settings.ttsRate })}
                   aria-label="Play"
-                  className="icon-circle size-10"
+                  className={`${tintCircle("sky")} size-10`}
                 >
                   <Volume2 size={17} strokeWidth={1.75} />
                 </button>
@@ -358,11 +367,11 @@ export default function Review() {
                 key={r}
                 onClick={() => rate(r)}
                 className={`rounded-full py-2.5 transition-colors ${
-                  suggested === r ? "bg-ink text-on-ink" : r === Rating.Again ? "text-accent" : ""
+                  suggested === r ? `${RATING[r].solid} text-white` : RATING[r].ink
                 }`}
               >
                 <span className="block text-sm font-semibold">{Rating[r]}</span>
-                <span className={`block text-xs ${suggested === r ? "opacity-60" : "muted"}`}>
+                <span className={`block text-xs ${suggested === r ? "opacity-80" : "muted"}`}>
                   {formatInterval(previews[r].card.due - Date.now())}
                 </span>
               </button>

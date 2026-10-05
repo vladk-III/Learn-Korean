@@ -20,6 +20,19 @@
   --accent-soft: #fdebdf;
   --good: #3f8f5a;
   --bad: #d4553a;
+  /* Soft tint palette: *-soft is the fill, the plain name is the matching ink. */
+  --peach: #c4551a;
+  --peach-soft: #fde4d3;
+  --sage: #3b7a49;
+  --sage-soft: #dcefd9;
+  --sky: #2d6cab;
+  --sky-soft: #d9e9f8;
+  --lilac: #6a4cb0;
+  --lilac-soft: #e9e1f8;
+  --butter: #946c00;
+  --butter-soft: #fbeec4;
+  --rose: #b53c4c;
+  --rose-soft: #fbdde0;
   color-scheme: light;
 }
 
@@ -39,6 +52,18 @@
     --accent-soft: rgba(245, 134, 74, 0.16);
     --good: #6cbf86;
     --bad: #ee7a62;
+    --peach: #f6a173;
+    --peach-soft: rgba(246, 161, 115, 0.16);
+    --sage: #8fd09c;
+    --sage-soft: rgba(143, 208, 156, 0.15);
+    --sky: #8fbef1;
+    --sky-soft: rgba(143, 190, 241, 0.15);
+    --lilac: #bba4f0;
+    --lilac-soft: rgba(187, 164, 240, 0.16);
+    --butter: #efcf6b;
+    --butter-soft: rgba(239, 207, 107, 0.15);
+    --rose: #f2939e;
+    --rose-soft: rgba(242, 147, 158, 0.16);
     color-scheme: dark;
   }
 }
@@ -57,6 +82,18 @@
   --color-accent-soft: var(--accent-soft);
   --color-good: var(--good);
   --color-bad: var(--bad);
+  --color-peach: var(--peach);
+  --color-peach-soft: var(--peach-soft);
+  --color-sage: var(--sage);
+  --color-sage-soft: var(--sage-soft);
+  --color-sky: var(--sky);
+  --color-sky-soft: var(--sky-soft);
+  --color-lilac: var(--lilac);
+  --color-lilac-soft: var(--lilac-soft);
+  --color-butter: var(--butter);
+  --color-butter-soft: var(--butter-soft);
+  --color-rose: var(--rose);
+  --color-rose-soft: var(--rose-soft);
 }
 
 html,
@@ -71,6 +108,7 @@ body {
   font-feature-settings: "ss01", "cv11";
 }
 
+@layer components {
 /* White card with a hairline border (list rows, panels). */
 .card {
   background: var(--card);
@@ -120,7 +158,9 @@ body {
   transform: scale(0.98);
 }
 .btn:disabled {
-  opacity: 0.35;
+  background: var(--line);
+  color: var(--muted);
+  transform: none;
 }
 .btn-ink {
   background: var(--ink);
@@ -202,6 +242,7 @@ body {
 
 .hairline {
   border-color: var(--line);
+}
 }
 
 .pb-safe {

@@ -18,6 +18,7 @@ import { State, cardRetrievability, formatInterval } from "@/lib/fsrs";
 import { speak, ttsSupported, hasKoreanVoice, recognitionSupported } from "@/lib/speech";
 import { actions, dayKey, streak, useData, useHydrated, type Data, type Skill } from "@/lib/store";
 import Reminders from "@/components/Reminders";
+import { TINT, tintCircle, type Tint } from "@/lib/tints";
 
 const STATE_LABEL = ["new", "learning", "review", "relearning"];
 const SKILLS: Skill[] = ["reading", "writing", "listening", "speaking"];
@@ -43,7 +44,7 @@ function Week({ d }: { d: Data }) {
         <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
           <span className="label tabular-nums">{x.min || ""}</span>
           <div
-            className={`w-full max-w-7 rounded-full ${x.min >= goal ? "bg-ink" : x.today ? "bg-accent" : "bg-line"}`}
+            className={`w-full max-w-7 rounded-full ${x.min >= goal ? "bg-sage" : x.today ? "bg-accent" : "bg-line"}`}
             style={{ height: `${Math.max(8, (x.min / max) * 88)}px` }}
             title={`${x.min} min · ${x.rev} reviews`}
           />
@@ -57,12 +58,14 @@ function Week({ d }: { d: Data }) {
 /** Settings row in the style of the reference's "Main Components" list. */
 function SettingRow({
   icon: Icon,
+  tint = "sky",
   title,
   hint,
   value,
   children,
 }: {
   icon: typeof Flame;
+  tint?: Tint;
   title: string;
   hint: string;
   value?: React.ReactNode;
@@ -71,7 +74,7 @@ function SettingRow({
   return (
     <div className="border-b border-line py-4 last:border-0">
       <div className="flex items-center gap-4">
-        <span className="icon-circle size-12">
+        <span className={`${tintCircle(tint)} size-12`}>
           <Icon size={19} strokeWidth={1.75} />
         </span>
         <div className="min-w-0 flex-1">
@@ -120,10 +123,10 @@ export default function Me() {
     }
   };
 
-  const stats: [string, React.ReactNode][] = [
-    ["Day streak", st],
-    ["Cards", d.cards.length],
-    ["Mature", mature],
+  const stats: [string, React.ReactNode, Tint][] = [
+    ["Day streak", st, "peach"],
+    ["Cards", d.cards.length, "sky"],
+    ["Mature", mature, "sage"],
     [
       "Retention",
       trueRetention == null ? (
@@ -134,6 +137,7 @@ export default function Me() {
           <span className="muted text-2xl">%</span>
         </>
       ),
+      "lilac",
     ],
   ];
 
@@ -144,15 +148,15 @@ export default function Me() {
           Your
           <span className="muted block">progress</span>
         </h1>
-        <span className="mt-1 flex size-12 items-center justify-center rounded-full bg-ink text-on-ink">
+        <span className="mt-1 flex size-12 items-center justify-center rounded-full bg-accent text-white">
           <Flame size={20} strokeWidth={1.75} />
         </span>
       </header>
 
       <div className="sheet space-y-10 px-5 pt-6 pb-8">
         <section className="grid grid-cols-2 gap-3">
-          {stats.map(([label, v]) => (
-            <div key={label} className="tile flex min-h-28 flex-col justify-between p-4">
+          {stats.map(([label, v, t]) => (
+            <div key={label} className={`flex min-h-28 flex-col justify-between rounded-[1.4rem] p-4 ${TINT[t].soft}`}>
               <p className="font-medium">{label}</p>
               <p className="num-thin text-[2.4rem] leading-none">{v}</p>
             </div>
@@ -177,10 +181,10 @@ export default function Me() {
         <section>
           <h2 className="text-2xl font-semibold tracking-tight">Settings</h2>
           <div className="mt-2">
-            <SettingRow icon={Layers} title="New cards per day" hint="Recommended 15–25" value={s.newPerDay}>
+            <SettingRow icon={Layers} tint="peach" title="New cards per day" hint="Recommended 15–25" value={s.newPerDay}>
               <input type="range" min={5} max={30} value={s.newPerDay} onChange={(e) => actions.updateSettings({ newPerDay: +e.target.value })} className="w-full" />
             </SettingRow>
-            <SettingRow icon={Gauge} title="Target retention" hint="85–90% balances workload" value={`${Math.round(s.retention * 100)}%`}>
+            <SettingRow icon={Gauge} tint="sage" title="Target retention" hint="85–90% balances workload" value={`${Math.round(s.retention * 100)}%`}>
               <input
                 type="range"
                 min={80}
@@ -190,7 +194,7 @@ export default function Me() {
                 className="w-full"
               />
             </SettingRow>
-            <SettingRow icon={CalendarCheck} title="Daily goal" hint="Minutes of study per day" value={`${s.dailyGoalMin} min`}>
+            <SettingRow icon={CalendarCheck} tint="butter" title="Daily goal" hint="Minutes of study per day" value={`${s.dailyGoalMin} min`}>
               <input
                 type="range"
                 min={5}
@@ -201,7 +205,7 @@ export default function Me() {
                 className="w-full"
               />
             </SettingRow>
-            <SettingRow icon={GraduationCap} title="Assumed level" hint="Words at this level count as known" value={LEVELS[s.placement]}>
+            <SettingRow icon={GraduationCap} tint="lilac" title="Assumed level" hint="Words at this level count as known" value={LEVELS[s.placement]}>
               <div className="no-scrollbar flex gap-1 overflow-x-auto">
                 {LEVELS.map((l, i) => (
                   <button key={l} onClick={() => actions.updateSettings({ placement: i })} aria-pressed={s.placement === i} className="chip">
@@ -210,7 +214,7 @@ export default function Me() {
                 ))}
               </div>
             </SettingRow>
-            <SettingRow icon={Lock} title="Review-first lock" hint="Block saving while reviews are overdue">
+            <SettingRow icon={Lock} tint="rose" title="Review-first lock" hint="Block saving while reviews are overdue">
               <div className="flex gap-1">
                 {[true, false].map((v) => (
                   <button
@@ -224,7 +228,7 @@ export default function Me() {
                 ))}
               </div>
             </SettingRow>
-            <SettingRow icon={Volume2} title="Skills in mixed reviews" hint="Which exercises to rotate through">
+            <SettingRow icon={Volume2} tint="sky" title="Skills in mixed reviews" hint="Which exercises to rotate through">
               <div className="flex flex-wrap gap-1">
                 {SKILLS.map((k) => (
                   <button
@@ -264,7 +268,7 @@ export default function Me() {
             {cards.length === 0 && <li className="muted p-3 text-sm">No cards yet.</li>}
             {cards.slice(0, 100).map((c) => (
               <li key={c.id} className="card flex items-start gap-3 p-4">
-                <button onClick={() => speak(c.sentence, { rate: s.ttsRate })} aria-label="Play" className="icon-circle size-10">
+                <button onClick={() => speak(c.sentence, { rate: s.ttsRate })} aria-label="Play" className={`${tintCircle("sky")} size-10`}>
                   <Volume2 size={16} strokeWidth={1.75} />
                 </button>
                 <div className="min-w-0 flex-1">

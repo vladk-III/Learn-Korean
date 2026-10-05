@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Keyboard, Layers, ListChecks, SquareStack, Trophy } from "lucide-react";
 import TopicIcon from "@/components/TopicIcon";
+import { tintCircle } from "@/lib/tints";
 import { studySets } from "@/lib/study";
 import { useData, useHydrated } from "@/lib/store";
 
@@ -19,7 +20,7 @@ export default function Study() {
           Study
           <span className="muted block">공부</span>
         </h1>
-        <Link href="/review/" aria-label="Back to review" className="mt-1 flex size-12 items-center justify-center rounded-full bg-sheet">
+        <Link href="/review/" aria-label="Back to review" className={`mt-1 flex size-12 items-center justify-center rounded-full ${tintCircle("peach")}`}>
           <Layers size={20} strokeWidth={1.75} />
         </Link>
       </header>
@@ -39,7 +40,7 @@ export default function Study() {
                   {s.topic ? (
                     <TopicIcon topic={s.topic} />
                   ) : (
-                    <span className="icon-circle size-12">
+                    <span className={`${tintCircle(s.id === "missed" ? "rose" : "peach")} size-12`}>
                       {s.id === "missed" ? <ListChecks size={20} strokeWidth={1.75} /> : <Layers size={20} strokeWidth={1.75} />}
                     </span>
                   )}
@@ -53,7 +54,7 @@ export default function Study() {
                   <Link href={`/study/flashcards/?set=${encodeURIComponent(s.id)}`} className="btn btn-ink h-11 text-sm">
                     <SquareStack size={16} strokeWidth={1.75} /> Flashcards
                   </Link>
-                  <Link href={`/study/type/?set=${encodeURIComponent(s.id)}`} className="btn btn-soft h-11 text-sm">
+                  <Link href={`/study/type/?set=${encodeURIComponent(s.id)}`} className="btn h-11 bg-butter-soft text-sm text-butter">
                     <Keyboard size={16} strokeWidth={1.75} /> Type It!
                     {best > 0 && (
                       <span className="muted flex items-center gap-0.5 text-xs">

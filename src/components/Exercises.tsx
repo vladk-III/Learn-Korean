@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { tintCircle, type Tint } from "@/lib/tints";
 import { Ear, Lightbulb, Mic, PenLine, Puzzle, Square, Turtle, Volume2 } from "lucide-react";
 import { tokenize } from "@/lib/analyzer";
 import { listenKorean, recognitionSupported, speak, stopSpeaking } from "@/lib/speech";
@@ -17,10 +18,12 @@ const btnPrimary = "btn btn-ink h-14 w-full text-base";
 const btnStop = "btn btn-accent h-14 w-full text-base";
 
 /** Small exercise label with a line icon, e.g. "Writing · Type the missing word". */
+const SKILL_TINT: Record<string, Tint> = { Reading: "lilac", Writing: "peach", Listening: "sky", Speaking: "sage" };
+
 function Kind({ icon: Icon, skill, task }: { icon: typeof Mic; skill: string; task: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="icon-circle size-10">
+      <span className={`${tintCircle(SKILL_TINT[skill])} size-10`}>
         <Icon size={17} strokeWidth={1.75} />
       </span>
       <div>
@@ -123,7 +126,7 @@ export function ListenExercise({ card, rate, onResult }: ExerciseProps) {
     <div className="space-y-5">
       <Kind icon={Ear} skill="Listening" task="Type the word you hear" />
       <div className="flex items-end justify-center gap-3 py-2">
-        <button onClick={() => play()} aria-label="Play" className="flex size-24 items-center justify-center rounded-full bg-ink text-on-ink">
+        <button onClick={() => play()} aria-label="Play" className="flex size-24 items-center justify-center rounded-full bg-sky text-white dark:text-[#10233a]">
           <Volume2 size={36} />
         </button>
         <button onClick={() => play(0.6)} aria-label="Play slowly" className="icon-circle size-12">
@@ -172,7 +175,7 @@ export function RebuildExercise({ card, onResult }: ExerciseProps) {
           <button
             key={i}
             onClick={() => setPicked((p) => p.filter((x) => x !== i))}
-            className="animate-pop ko rounded-full bg-ink px-4 py-2 text-lg font-medium text-on-ink"
+            className="animate-pop ko rounded-full bg-lilac-soft px-4 py-2 text-lg font-medium text-lilac"
           >
             {words[i]}
           </button>

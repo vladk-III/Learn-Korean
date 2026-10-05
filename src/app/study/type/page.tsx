@@ -219,20 +219,20 @@ function TypeIt() {
                 <button
                   key={m}
                   onClick={() => setMode(m)}
-                  className={`flex min-h-40 flex-col justify-between rounded-[1.4rem] p-4 text-left transition-colors ${
-                    on ? "bg-ink text-on-ink" : "tile"
-                  }`}
+                  className={`flex min-h-40 flex-col justify-between rounded-[1.4rem] border-2 p-4 text-left transition-colors ${
+                    m === "meaning" ? "bg-peach-soft" : "bg-sky-soft"
+                  } ${on ? (m === "meaning" ? "border-peach" : "border-sky") : "border-transparent"}`}
                 >
                   <div className="flex items-start justify-between">
                     <p className="leading-tight font-medium">
                       {label}
-                      <span className={`block text-sm font-normal ${on ? "opacity-60" : "muted"}`}>{desc}</span>
+                      <span className="sub block text-sm font-normal">{desc}</span>
                     </p>
-                    <Icon size={20} strokeWidth={1.75} />
+                    <Icon size={20} strokeWidth={1.75} className={m === "meaning" ? "text-peach" : "text-sky"} />
                   </div>
                   <p className="num-thin text-[2.2rem] leading-none">
                     {b || "—"}
-                    <span className={`ml-1 text-sm font-normal tracking-normal ${on ? "opacity-60" : "muted"}`}>best</span>
+                    <span className="sub ml-1 text-sm font-normal tracking-normal">best</span>
                   </p>
                 </button>
               );
@@ -253,7 +253,7 @@ function TypeIt() {
         <span className={newBest ? "pill" : "pill pill-soft"}>
           {newBest ? "New best" : lives <= 0 ? "Out of lives" : "Time's up"}
         </span>
-        <p className="num-thin mt-3 text-[5.5rem] leading-none">{score}</p>
+        <p className="num-thin mt-3 text-[5.5rem] leading-none text-accent">{score}</p>
         <p className="muted mt-2 text-[15px]">
           {correct} correct · best combo {bestCombo}× · personal best {Math.max(best, score)}
         </p>
@@ -264,7 +264,7 @@ function TypeIt() {
             <ul className="mt-3 space-y-2">
               {missed.map((it) => (
                 <li key={it.ko} className="card flex items-center gap-3 px-4 py-3">
-                  <button onClick={() => say(it)} aria-label="Play" className="icon-circle size-10">
+                  <button onClick={() => say(it)} aria-label="Play" className="icon-circle size-10 bg-sky-soft text-sky">
                     <Volume2 size={16} strokeWidth={1.75} />
                   </button>
                   <b className="ko font-semibold">{it.ko}</b>
@@ -319,19 +319,19 @@ function TypeIt() {
               size={17}
               strokeWidth={1.75}
               fill={k < lives ? "currentColor" : "none"}
-              className={k < lives ? "text-accent" : "muted"}
+              className={k < lives ? "text-rose" : "muted"}
             />
           ))}
         </span>
         <span className="label ml-auto flex items-center gap-1 tabular-nums">
           <Flame size={14} className={combo > 0 ? "text-accent" : ""} /> {combo}×
         </span>
-        <span className="num-thin text-2xl tabular-nums">{score}</span>
+        <span className="num-thin text-2xl text-accent tabular-nums">{score}</span>
       </header>
 
       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-line">
         <div
-          className={`h-full rounded-full transition-all duration-1000 ${low ? "bg-accent" : "bg-ink"}`}
+          className={`h-full rounded-full transition-all duration-1000 ${low ? "bg-rose" : "bg-butter"}`}
           style={{ width: `${Math.min(100, (timeLeft / GAME_SECONDS) * 100)}%` }}
         />
       </div>
@@ -349,7 +349,7 @@ function TypeIt() {
             <button
               onClick={() => say(item)}
               aria-label="Play again"
-              className="mx-auto mt-3 flex size-24 items-center justify-center rounded-full bg-ink text-on-ink"
+              className="mx-auto mt-3 flex size-24 items-center justify-center rounded-full bg-sky text-white"
             >
               <Volume2 size={36} strokeWidth={1.75} />
             </button>
@@ -430,7 +430,7 @@ function TypeIt() {
               <SkipForward size={16} strokeWidth={1.75} />
             </button>
           )}
-          <button type="submit" className="btn btn-ink h-14 text-base">
+          <button type="submit" className="btn btn-accent h-14 text-base">
             Enter
           </button>
         </div>

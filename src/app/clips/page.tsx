@@ -13,6 +13,7 @@ import Quiz from "@/components/Quiz";
 import type { Token } from "@/lib/analyzer";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { coverage, useData, useHydrated, type Data } from "@/lib/store";
+import { TINT, tintFor } from "@/lib/tints";
 
 const PITCH = { A: 1.2, B: 0.85 } as const;
 
@@ -103,15 +104,16 @@ function ClipCard({
 
   const s = clip.sentences[line];
   const cov = coverage(data, clip);
+  const tint = tintFor(clip.id);
 
   return (
-    <section className="relative flex h-[calc(100dvh-4.75rem)] snap-start snap-always flex-col bg-canvas">
+    <section className={`relative flex h-[calc(100dvh-4.75rem)] snap-start snap-always flex-col ${TINT[tint].soft}`}>
       <div className="pt-safe flex items-start justify-between px-5 pt-6">
         <h2 className="display text-[2.1rem]">
           <span className="ko">{clip.title}</span>
           <span className="muted block text-[1.4rem]">{clip.titleEn}</span>
         </h2>
-        <span className="pill pill-soft mt-1.5 shrink-0">{clip.level}</span>
+        <span className={`pill mt-1.5 shrink-0 bg-sheet ${TINT[tint].ink}`}>{clip.level}</span>
       </div>
       <div className="mt-3 flex gap-1.5 px-5">
         <CoverageBadge pct={cov.pct} compact />
@@ -153,7 +155,7 @@ function ClipCard({
           <button key={label} onClick={on} className="flex flex-col items-center gap-1 text-[10px] font-medium">
             <span
               className={`flex size-11 items-center justify-center rounded-full transition-colors ${
-                a ? "bg-ink text-on-ink" : "bg-sheet"
+                a ? `${TINT[tint].solid} text-white` : "bg-sheet"
               }`}
             >
               <Icon size={18} strokeWidth={1.75} />
@@ -176,13 +178,15 @@ function ClipCard({
               key={i}
               onClick={() => start(i)}
               aria-label={`Line ${i + 1}`}
-              className={`h-1 flex-1 rounded-full transition-colors ${i <= line ? "bg-ink" : "bg-line"}`}
+              className={`h-1 flex-1 rounded-full transition-colors ${i <= line ? TINT[tint].solid : "bg-sheet"}`}
             />
           ))}
         </div>
         <div className="min-h-36 rounded-[1.75rem] bg-sheet p-5">
           {s.speaker && (
-            <span className="pill pill-soft mb-1.5">{s.speaker === "A" ? "Speaker A" : "Speaker B"}</span>
+            <span className={`pill mb-1.5 ${s.speaker === "A" ? "bg-sky-soft text-sky" : "bg-rose-soft text-rose"}`}>
+              {s.speaker === "A" ? "Speaker A" : "Speaker B"}
+            </span>
           )}
           <p className="text-[1.6rem] leading-snug font-semibold tracking-tight">
             <InteractiveSentence
