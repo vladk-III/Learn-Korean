@@ -1,6 +1,7 @@
 import type { Article } from "./types";
 import { DLPT_ARTICLES } from "./dlpt";
 import { DLPT_ARTICLES_2 } from "./dlpt2";
+import { DLPT_ARTICLES_3 } from "./dlpt3";
 
 /**
  * Graded news stories. These are original, news-style texts written for
@@ -112,7 +113,7 @@ const BASE_ARTICLES: Article[] = [
     emoji: "🤖",
     sentences: [
       { ko: "한국을 찾는 외국인 관광객이 늘면서 AI 번역 앱 사용도 크게 증가했습니다.", en: "As more foreign tourists visit Korea, use of AI translation apps has risen sharply." },
-      { ko: "관광객들은 식당에서 메뉴를 읽거나 길을 물을 때 번역 앱을 자주 이용합니다.", en: "Tourists often use translation apps to read menus at restaurants or ask for directions." },
+      { ko: "관광객들은 식당에서 메뉴를 읽거나 길을 찾을 때 번역 앱을 자주 이용합니다.", en: "Tourists often use translation apps to read menus at restaurants or find their way." },
       { ko: "최근에는 사진을 찍으면 바로 번역해 주는 기능이 특히 인기를 끌고 있습니다.", en: "Recently, a feature that translates instantly when you take a photo has been especially popular." },
       { ko: "한 프랑스 관광객은 한국어를 몰라도 여행하는 데 문제가 없었다고 말했습니다.", en: "One French tourist said they had no trouble traveling even without knowing Korean." },
       { ko: "하지만 번역이 항상 정확한 것은 아닙니다.", en: "But translations are not always accurate." },
@@ -194,4 +195,4 @@ const BASE_ARTICLES: Article[] = [
 ];
 
 /** Newest first, so the exam-prep stories lead the feed. */
-export const ARTICLES: Article[] = [...DLPT_ARTICLES, ...DLPT_ARTICLES_2, ...BASE_ARTICLES].sort((a, b) => b.date.localeCompare(a.date));
+export const ARTICLES: Article[] = [...DLPT_ARTICLES, ...DLPT_ARTICLES_2, ...DLPT_ARTICLES_3, ...BASE_ARTICLES].sort((a, b) => b.date.localeCompare(a.date));

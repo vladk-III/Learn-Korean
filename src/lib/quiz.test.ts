@@ -68,9 +68,9 @@ describe("quizlet DLPT sets", async () => {
   it("turns the uploaded cards into study sets with story context", () => {
     const empty = { cards: [], imported: [] } as unknown as Parameters<typeof studySets>[0];
     const sets = studySets(empty).filter((s) => s.id.startsWith("quizlet-dlpt"));
-    expect(sets).toHaveLength(4);
+    expect(sets).toHaveLength(9);
     const all = sets.flatMap((s) => s.items);
-    expect(all.length).toBeGreaterThan(390);
+    expect(all.length).toBeGreaterThan(890);
     const arrest = all.find((i) => i.ko === "검거하다")!;
     expect(arrest.sentence).toContain(arrest.target!);
     const nurse = all.find((i) => i.ko === "간호사")!;

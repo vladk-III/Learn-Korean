@@ -1,7 +1,18 @@
 /** Study sets for flashcards and the typing game (Quizlet-style practice). */
 import { ARTICLES } from "@/content/articles";
 import { CLIPS } from "@/content/clips";
-import { DLPT_1_100, DLPT_101_200, DLPT_201_300, DLPT_LOWER, type BankTerm } from "@/content/dlptBank";
+import {
+  DLPT_1_100,
+  DLPT_101_200,
+  DLPT_201_300,
+  DLPT_301_400,
+  DLPT_401_500,
+  DLPT_501_600,
+  DLPT_601_700,
+  DLPT_701_800,
+  DLPT_LOWER,
+  type BankTerm,
+} from "@/content/dlptBank";
 import type { Content, Topic } from "@/content/types";
 import { tokenize } from "./analyzer";
 import { State } from "./fsrs";
@@ -117,6 +128,11 @@ const BANK: { id: string; title: string; terms: BankTerm[] }[] = [
   { id: "quizlet-dlpt-1", title: "Quizlet DLPT 1–100", terms: DLPT_1_100 },
   { id: "quizlet-dlpt-2", title: "Quizlet DLPT 101–200", terms: DLPT_101_200 },
   { id: "quizlet-dlpt-3", title: "Quizlet DLPT 201–300", terms: DLPT_201_300 },
+  { id: "quizlet-dlpt-4", title: "Quizlet DLPT 301–400", terms: DLPT_301_400 },
+  { id: "quizlet-dlpt-5", title: "Quizlet DLPT 401–500", terms: DLPT_401_500 },
+  { id: "quizlet-dlpt-6", title: "Quizlet DLPT 501–600", terms: DLPT_501_600 },
+  { id: "quizlet-dlpt-7", title: "Quizlet DLPT 601–700", terms: DLPT_601_700 },
+  { id: "quizlet-dlpt-8", title: "Quizlet DLPT 701–800", terms: DLPT_701_800 },
   { id: "quizlet-dlpt-lower", title: "Quizlet lower-level DLPT", terms: DLPT_LOWER },
 ];
 

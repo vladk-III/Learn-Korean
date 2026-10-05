@@ -1,6 +1,7 @@
 import type { Clip } from "./types";
 import { OPI_CLIPS } from "./dlpt";
 import { DLPT_CLIPS_2 } from "./dlpt2";
+import { DLPT_CLIPS_3 } from "./dlpt3";
 
 /**
  * Short-form clips: vertical, swipeable, sentence-synced audio scenes
@@ -139,4 +140,4 @@ const BASE_CLIPS: Clip[] = [
   },
 ];
 
-export const CLIPS: Clip[] = [...BASE_CLIPS, ...OPI_CLIPS, ...DLPT_CLIPS_2];
+export const CLIPS: Clip[] = [...BASE_CLIPS, ...OPI_CLIPS, ...DLPT_CLIPS_2, ...DLPT_CLIPS_3];

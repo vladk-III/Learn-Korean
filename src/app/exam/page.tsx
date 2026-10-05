@@ -8,12 +8,27 @@ import { DLPT_RESOURCES, OPI_QUESTIONS, OPI_RESOURCES, OPI_TIPS, type Resource }
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useData, useHydrated } from "@/lib/store";
 import { tintCircle, type Tint } from "@/lib/tints";
-import { DLPT_1_100, DLPT_101_200, DLPT_201_300, DLPT_LOWER } from "@/content/dlptBank";
+import {
+  DLPT_1_100,
+  DLPT_101_200,
+  DLPT_201_300,
+  DLPT_301_400,
+  DLPT_401_500,
+  DLPT_501_600,
+  DLPT_601_700,
+  DLPT_701_800,
+  DLPT_LOWER,
+} from "@/content/dlptBank";
 
 const QUIZLET_SETS = [
   { id: "quizlet-dlpt-1", title: "Quizlet DLPT 1–100", note: `${DLPT_1_100.length} terms · 가격 → 귀금속` },
   { id: "quizlet-dlpt-2", title: "Quizlet DLPT 101–200", note: `${DLPT_101_200.length} terms · 기아 → 무료` },
   { id: "quizlet-dlpt-3", title: "Quizlet DLPT 201–300", note: `${DLPT_201_300.length} terms · 무리하게 → 살신성인` },
+  { id: "quizlet-dlpt-4", title: "Quizlet DLPT 301–400", note: `${DLPT_301_400.length} terms · 살해하다 → 실종되다` },
+  { id: "quizlet-dlpt-5", title: "Quizlet DLPT 401–500", note: `${DLPT_401_500.length} terms · 실험장 → 유흥 업소` },
+  { id: "quizlet-dlpt-6", title: "Quizlet DLPT 501–600", note: `${DLPT_501_600.length} terms · 육안 → 전망되다` },
+  { id: "quizlet-dlpt-7", title: "Quizlet DLPT 601–700", note: `${DLPT_601_700.length} terms · 전면 해제 → 참석하다` },
+  { id: "quizlet-dlpt-8", title: "Quizlet DLPT 701–800", note: `${DLPT_701_800.length} terms · 참여하다 → 하행선` },
   { id: "quizlet-dlpt-lower", title: "Quizlet lower-level DLPT", note: `${DLPT_LOWER.length} terms · 가격인상 → 구입하다` },
 ];
 
