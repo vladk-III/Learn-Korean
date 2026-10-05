@@ -20,16 +20,18 @@ describe("buildQuiz", () => {
   });
 
   it("quizzes tapped words first", () => {
-    const q = buildQuiz(ARTICLES[2], { tapped: ["요금"], seed: 3 });
+    const subway = ARTICLES.find((a) => a.id === "a2-subway-fare")!;
+    const q = buildQuiz(subway, { tapped: ["요금"], seed: 3 });
     expect(q[0].kind).toBe("meaning");
     expect(q[0].kind === "meaning" && q[0].lemma).toBe("요금");
   });
 
   it("cloze answer fits the blank", () => {
-    const q = buildQuiz(ARTICLES[0], { seed: 5 }).find((x) => x.kind === "cloze");
+    const snow = ARTICLES.find((a) => a.id === "a1-first-snow")!;
+    const q = buildQuiz(snow, { seed: 5 }).find((x) => x.kind === "cloze");
     expect(q).toBeDefined();
     if (q?.kind === "cloze") {
-      expect(q.before + q.options[q.answer] + q.after).toBe(ARTICLES[0].sentences[q.sentenceIdx].ko);
+      expect(q.before + q.options[q.answer] + q.after).toBe(snow.sentences[q.sentenceIdx].ko);
     }
   });
 });
@@ -45,5 +47,18 @@ describe("study sets", async () => {
         expect(new Set(items.map((x) => x.ko)).size).toBe(items.length);
       }
     }
+  });
+});
+
+describe("exam sets", async () => {
+  const { studySets } = await import("./study");
+  it("builds DLPT and OPI vocabulary sets", () => {
+    const empty = { cards: [], imported: [] } as unknown as Parameters<typeof studySets>[0];
+    const sets = studySets(empty);
+    const dlpt = sets.find((s) => s.id === "dlpt-core")!;
+    const opi = sets.find((s) => s.id === "opi-core")!;
+    expect(dlpt.items.length).toBeGreaterThan(100);
+    expect(opi.items.length).toBeGreaterThan(30);
+    expect(dlpt.items.map((i) => i.ko)).toContain("훈련");
   });
 });

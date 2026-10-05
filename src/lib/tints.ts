@@ -18,6 +18,9 @@ export const TOPIC_TINT: Record<Topic, Tint> = {
   Culture: "lilac",
   Tech: "sage",
   World: "peach",
+  Security: "rose",
+  Politics: "sky",
+  Economy: "butter",
 };
 
 const ORDER: Tint[] = ["peach", "sky", "sage", "lilac", "butter", "rose"];

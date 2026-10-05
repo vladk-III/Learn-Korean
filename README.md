@@ -14,6 +14,7 @@ practice for all four skills: reading, writing, listening and speaking.
 | **Sentence mining (1T rule)** | "Mine sentence" saves the full sentence with one highlighted target word. If the sentence has other unknown words, you're prompted to pick a single target or mark the others as known. |
 | **Active-recall review (FSRS-5)** | Each review is an exercise, not a flip card: 🧩 **Reading** – rebuild the sentence from word tiles · ✍️ **Writing** – type the missing target word · 🎧 **Listening** – hear the sentence, type the missing word · 🗣️ **Speaking** – shadow the sentence, scored by speech recognition (with a syllable-level diff). Rate Again/Hard/Good/Easy (a rating is suggested from your answer); buttons show the next interval. |
 | **Review discipline** | Overdue reviews lock mining (toggleable). New cards are capped per day (15–25 recommended), target retention is adjustable (85–90%). |
+| **DLPT & OPI prep** | 10 DLPT-style stories (security, politics, economy, North Korea, disasters, cyber, space) and 6 OPI-style interview clips, a DLPT filter in News, DLPT/OPI vocabulary sets in Study, and an Exam prep page with test overviews, curated resources and an OPI speaking drill (random questions by ILR level, timer, record & play back). |
 | **Habit tracking** | Daily-minutes goal ring, streak, weekly chart, true retention. |
 | **Offline & private** | Works offline as a PWA. All data stays on your device; export/import a JSON backup from the *Me* tab. |
 
@@ -100,7 +101,7 @@ prisma/schema.prisma   Server schema (Users, Words, Articles, MinedSentences, Sr
   (`lemma|pos|level|gloss|irregular,forms`). Regular conjugations and particles are
   handled by the analyzer.
 - `npm test` fails if any word in the bundled content can't be glossed, and
-  `DUMP=1 npx vitest run src/content` prints how every word was analysed.
+  `DUMP=/tmp/words.txt npx vitest run src/content` writes how every word was analysed.
 
 ### How the pieces map to the learning science
 - **Comprehensible input (i+1):** per-text known-word % from your placement level,

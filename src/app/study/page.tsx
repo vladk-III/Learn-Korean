@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Keyboard, Layers, ListChecks, SquareStack, Trophy } from "lucide-react";
+import { ChevronRight, GraduationCap, Keyboard, Layers, ListChecks, SquareStack, Trophy } from "lucide-react";
 import TopicIcon from "@/components/TopicIcon";
 import { tintCircle } from "@/lib/tints";
 import { studySets } from "@/lib/study";
@@ -31,7 +31,18 @@ export default function Study() {
           words you miss to your reviews.
         </p>
 
-        <ul className="mt-5 space-y-3">
+        <Link href="/exam/" className="mt-5 flex items-center gap-4 rounded-[1.4rem] bg-rose-soft p-4">
+          <span className="flex size-12 items-center justify-center rounded-full bg-rose text-white">
+            <GraduationCap size={20} strokeWidth={1.75} />
+          </span>
+          <div className="flex-1">
+            <p className="font-semibold">DLPT &amp; OPI exam prep</p>
+            <p className="sub text-sm">Test format, resources, speaking drill</p>
+          </div>
+          <ChevronRight size={18} className="text-rose" />
+        </Link>
+
+        <ul className="mt-3 space-y-3">
           {sets.map((s) => {
             const best = Math.max(d.bestScores[`${s.id}:meaning`] ?? 0, d.bestScores[`${s.id}:listen`] ?? 0);
             return (

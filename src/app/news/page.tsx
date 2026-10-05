@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ClipboardPaste, Trash2 } from "lucide-react";
 import { ARTICLES } from "@/content/articles";
 import type { Cefr, Topic } from "@/content/types";
@@ -9,7 +10,7 @@ import CoverageBadge from "@/components/CoverageBadge";
 import TopicIcon from "@/components/TopicIcon";
 import { actions, coverage, useData, useHydrated } from "@/lib/store";
 
-const TOPICS: (Topic | "All")[] = ["All", "Life", "Society", "Culture", "Tech", "World"];
+const TOPICS: (Topic | "All" | "DLPT prep")[] = ["All", "DLPT prep", "Security", "Politics", "Economy", "Society", "Tech", "World", "Life", "Culture"];
 const LEVELS: (Cefr | "All")[] = ["All", "A1", "A2", "B1", "B2"];
 
 function Chips<T extends string>({ items, value, onChange }: { items: T[]; value: T; onChange: (v: T) => void }) {
@@ -24,16 +25,20 @@ function Chips<T extends string>({ items, value, onChange }: { items: T[]; value
   );
 }
 
-export default function News() {
+function NewsFeed() {
   const d = useData();
   const hydrated = useHydrated();
-  const [topic, setTopic] = useState<Topic | "All">("All");
+  const [topic, setTopic] = useState<Topic | "All" | "DLPT prep">(
+    useSearchParams().get("track") === "dlpt" ? "DLPT prep" : "All",
+  );
   const [level, setLevel] = useState<Cefr | "All">("All");
   if (!hydrated) return null;
 
   const list = [...d.imported, ...ARTICLES]
     .filter(
-      (a) => (topic === "All" || a.topic === topic || a.imported) && (level === "All" || a.level === level || a.imported),
+      (a) =>
+        (topic === "All" || (topic === "DLPT prep" ? a.track === "dlpt" : a.topic === topic) || a.imported) &&
+        (level === "All" || a.level === level || a.imported),
     )
     .map((a) => ({ a, cov: coverage(d, a) }));
 
@@ -99,5 +104,13 @@ export default function News() {
         </ul>
       </div>
     </div>
+  );
+}
+
+export default function News() {
+  return (
+    <Suspense>
+      <NewsFeed />
+    </Suspense>
   );
 }

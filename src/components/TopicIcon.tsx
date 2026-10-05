@@ -1,4 +1,4 @@
-import { Building2, Coffee, Cpu, Drama, FileText, Globe2 } from "lucide-react";
+import { Building2, Coffee, Cpu, Drama, FileText, Globe2, Landmark, Shield, TrendingUp } from "lucide-react";
 import type { Topic } from "@/content/types";
 import { TOPIC_TINT, tintCircle } from "@/lib/tints";
 
@@ -8,6 +8,9 @@ const ICONS: Record<Topic, typeof Coffee> = {
   Culture: Drama,
   Tech: Cpu,
   World: Globe2,
+  Security: Shield,
+  Politics: Landmark,
+  Economy: TrendingUp,
 };
 
 /** Line icon in a topic-tinted circle, used instead of emoji for content. */

@@ -1,4 +1,5 @@
 import type { Article } from "./types";
+import { DLPT_ARTICLES } from "./dlpt";
 
 /**
  * Graded news stories. These are original, news-style texts written for
@@ -6,7 +7,7 @@ import type { Article } from "./types";
  * word is covered by the built-in dictionary. Real articles can be added via
  * "Paste your own" in the News tab.
  */
-export const ARTICLES: Article[] = [
+const BASE_ARTICLES: Article[] = [
   {
     id: "a1-first-snow",
     kind: "news",
@@ -190,3 +191,6 @@ export const ARTICLES: Article[] = [
     ],
   },
 ];
+
+/** Newest first, so the exam-prep stories lead the feed. */
+export const ARTICLES: Article[] = [...DLPT_ARTICLES, ...BASE_ARTICLES].sort((a, b) => b.date.localeCompare(a.date));

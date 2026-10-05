@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AlarmClock, BookOpen, ChevronRight, Clapperboard, Flame, Layers, Lock, Plus, SquareStack } from "lucide-react";
+import { AlarmClock, BookOpen, ChevronRight, Clapperboard, Flame, GraduationCap, Layers, Lock, Plus, SquareStack } from "lucide-react";
 import { ARTICLES } from "@/content/articles";
 import { CLIPS } from "@/content/clips";
 import CoverageBadge from "@/components/CoverageBadge";
@@ -173,6 +173,7 @@ export default function Today() {
             extra={<CoverageBadge pct={pick.cov.pct} />}
           />
           <Row href={`/clips/?id=${clip.id}`} icon={Clapperboard} tint="lilac" title={clip.title} status={`Clip · ${clip.titleEn}`} />
+          <Row href="/exam/" icon={GraduationCap} tint="rose" title="DLPT & OPI prep" status="Exam stories, vocab & speaking drill" />
           <Row href="/study/" icon={SquareStack} tint="sage" title="Flashcards & Type It!" status="Practice games" />
         </ul>
       </div>

@@ -73,8 +73,34 @@ function itemsFromCards(cards: Data["cards"]): StudyItem[] {
   }));
 }
 
+/** Every distinct word across the content written for one exam. */
+function trackItems(track: "dlpt" | "opi"): StudyItem[] {
+  const seen = new Set<string>();
+  return [...ARTICLES, ...CLIPS]
+    .filter((c) => c.track === track)
+    .flatMap(itemsFromContent)
+    .filter((it) => !seen.has(it.ko) && seen.add(it.ko));
+}
+
 export function studySets(d: Data): StudySet[] {
-  const sets: StudySet[] = [];
+  const sets: StudySet[] = [
+    {
+      id: "dlpt-core",
+      title: "DLPT core vocabulary",
+      subtitle: "Security, politics, economy & North Korea — from every DLPT story",
+      emoji: "🎖️",
+      topic: "Security",
+      items: trackItems("dlpt"),
+    },
+    {
+      id: "opi-core",
+      title: "OPI speaking vocabulary",
+      subtitle: "Words from the interview-style clips",
+      emoji: "🎙️",
+      topic: "Culture",
+      items: trackItems("opi"),
+    },
+  ];
   if (d.cards.length)
     sets.push({
       id: "deck",

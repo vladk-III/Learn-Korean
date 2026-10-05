@@ -1,10 +1,11 @@
 import type { Clip } from "./types";
+import { OPI_CLIPS } from "./dlpt";
 
 /**
  * Short-form clips: vertical, swipeable, sentence-synced audio scenes
  * (spoken with the device's Korean text-to-speech voice).
  */
-export const CLIPS: Clip[] = [
+const BASE_CLIPS: Clip[] = [
   {
     id: "c-intro",
     kind: "clip",
@@ -136,3 +137,5 @@ export const CLIPS: Clip[] = [
     ],
   },
 ];
+
+export const CLIPS: Clip[] = [...BASE_CLIPS, ...OPI_CLIPS];

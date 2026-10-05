@@ -12,6 +12,7 @@ import CoverageBadge from "@/components/CoverageBadge";
 import Quiz from "@/components/Quiz";
 import type { Token } from "@/lib/analyzer";
 import { speak, stopSpeaking } from "@/lib/speech";
+import { shuffle } from "@/lib/text";
 import { coverage, useData, useHydrated, type Data } from "@/lib/store";
 import { TINT, tintFor } from "@/lib/tints";
 
@@ -221,16 +222,33 @@ function ClipCard({
   );
 }
 
+/** Fresh random order on every visit; a linked clip (?id=) always comes first. */
+function shuffledClips(startId: string | null): Clip[] {
+  const rest = shuffle(
+    CLIPS.filter((c) => c.id !== startId),
+    Math.floor(Math.random() * 2 ** 31),
+  );
+  const first = CLIPS.find((c) => c.id === startId);
+  return first ? [first, ...rest] : rest;
+}
+
 function Feed() {
   const d = useData();
   const hydrated = useHydrated();
   const startId = useSearchParams().get("id");
+  const [order, setOrder] = useState<Clip[] | null>(null);
   const [active, setActive] = useState(0);
   const [started, setStarted] = useState(false);
   const refs = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Shuffle on the client after mount (so the static HTML and first render agree).
   useEffect(() => {
-    if (!hydrated) return;
+    setOrder(shuffledClips(startId));
+    setActive(0);
+  }, [startId]);
+
+  useEffect(() => {
+    if (!hydrated || !order) return;
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries)
@@ -239,16 +257,14 @@ function Feed() {
       { threshold: 0.6 },
     );
     refs.current.forEach((el) => el && io.observe(el));
-    const idx = CLIPS.findIndex((c) => c.id === startId);
-    if (idx > 0) refs.current[idx]?.scrollIntoView();
     return () => io.disconnect();
-  }, [hydrated, startId]);
+  }, [hydrated, order]);
 
-  if (!hydrated) return null;
+  if (!hydrated || !order) return null;
 
   return (
     <div className="no-scrollbar h-[calc(100dvh-4.75rem)] snap-y snap-mandatory overflow-y-scroll">
-      {CLIPS.map((c, i) => (
+      {order.map((c, i) => (
         <div
           key={c.id}
           data-index={i}
